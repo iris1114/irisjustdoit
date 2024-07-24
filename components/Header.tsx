@@ -1,3 +1,11 @@
+/*
+ * @Author: irischew1114 qweichew@gmail.com
+ * @Date: 2024-07-24 13:44:49
+ * @LastEditors: irischew1114 qweichew@gmail.com
+ * @LastEditTime: 2024-07-24 18:45:48
+ * @FilePath: /irisjustdoit/components/Header.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import Logo from '@/data/logo.svg'
@@ -32,7 +40,7 @@ const Header = () => {
             <Link
               key={link.title}
               href={link.href}
-              className="hidden font-medium text-gray-900 hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400
+              className="hidden font-medium text-gray-900 hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-500
               sm:block"
             >
               {link.title}
