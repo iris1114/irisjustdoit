@@ -7,14 +7,14 @@ import { genPageMetadata } from 'app/seo'
 export const metadata = genPageMetadata({ title: 'About' })
 
 export default function Page() {
-  const author = allAuthors.find((p) => p.slug === 'default') as Authors
-  const mainContent = coreContent(author)
+  const authors = allAuthors.map((author) => ({
+    ...coreContent(author),
+    bodyCode: author.body.code,
+  }))
 
   return (
     <>
-      <AuthorLayout content={mainContent}>
-        <MDXLayoutRenderer code={author.body.code} />
-      </AuthorLayout>
+      <AuthorLayout authors={authors} />
     </>
   )
 }

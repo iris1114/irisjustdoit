@@ -1,25 +1,26 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Next.js Starter Blog',
-  author: 'Tails Azimuth',
-  headerTitle: 'TailwindBlog',
-  description: 'A blog created with Next.js and Tailwind.css',
+  title: 'irisjustdoit',
+  author: 'Iris Chew',
+  headerTitle: 'irisjustdoit',
+  description: '前端旅遊紀錄生活的部落格',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
+  siteUrl: 'https://iris-new-blog.netlify.app/',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
-  mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'address@yoursite.com',
-  github: 'https://github.com',
-  x: 'https://twitter.com/x',
+  // mastodon: 'https://mastodon.social/@mastodonuser',
+  email: 'qweichew@gmail.com',
+  github: 'https://github.com/iris1114',
+  linkedin: 'https://www.linkedin.com/in/iris-chew/',
+  // x: 'https://twitter.com/x',
   // twitter: 'https://twitter.com/Twitter',
-  facebook: 'https://facebook.com',
-  youtube: 'https://youtube.com',
+  facebook: 'https://www.facebook.com/irischew93/',
+  youtube: 'https://www.youtube.com/@irisjustdoit',
   linkedin: 'https://www.linkedin.com',
-  threads: 'https://www.threads.net',
-  instagram: 'https://www.instagram.com',
+  // threads: 'https://www.threads.net',
+  instagram: 'https://www.instagram.com/irisjustdoit/',
   locale: 'en-US',
   analytics: {
     // If you want to use an analytics provider you have to add it to the
@@ -34,7 +35,7 @@ const siteMetadata = {
     },
     // plausibleAnalytics: {
     //   plausibleDataDomain: '', // e.g. tailwind-nextjs-starter-blog.vercel.app
-         // If you are hosting your own Plausible.
+    // If you are hosting your own Plausible.
     //   src: '', // e.g. https://plausible.my-domain.com/js/script.js
     // },
     // simpleAnalytics: {},
