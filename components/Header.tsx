@@ -2,7 +2,7 @@
  * @Author: irischew1114 qweichew@gmail.com
  * @Date: 2024-07-24 13:44:49
  * @LastEditors: irischew1114 qweichew@gmail.com
- * @LastEditTime: 2024-07-24 18:45:48
+ * @LastEditTime: 2024-07-25 15:11:42
  * @FilePath: /irisjustdoit/components/Header.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,15 +21,8 @@ const Header = () => {
         <Link href="/" aria-label={siteMetadata.headerTitle}>
           <div className="flex items-center justify-between">
             <div className="mr-3">
-              <Logo />
+              <Logo className="fill-gray-900 dark:fill-gray-100" />{' '}
             </div>
-            {typeof siteMetadata.headerTitle === 'string' ? (
-              <div className="hidden h-6 text-2xl font-semibold sm:block">
-                {siteMetadata.headerTitle}
-              </div>
-            ) : (
-              siteMetadata.headerTitle
-            )}
           </div>
         </Link>
       </div>
