@@ -14,7 +14,7 @@ export default function Home({ posts }) {
       <div className="mb-12 flex flex-col items-center justify-evenly md:flex-row">
         <div className="order-1 md:w-1/2">
           <h2 className="py-4 text-2xl md:text-3xl"> Iris Just Do It.</h2>
-          <p>喜歡旅行、美食、挑戰的前端工程師，立志過「想要就 just do it」的生活。</p>
+          <p>喜歡旅行、挑戰、分享、學習新事物，立志過「just do it」的生活。</p>
         </div>
         <div className=" w-full md:order-1 md:w-1/2">
           <HeroImg className=" fill-gray-800 dark:fill-gray-500" />
