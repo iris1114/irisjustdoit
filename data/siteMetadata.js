@@ -11,7 +11,7 @@ const siteMetadata = {
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
   // mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'qweichew@gmail.com',
+  email: 'chickplayground@gmail.com',
   github: 'https://github.com/iris1114',
   // x: 'https://twitter.com/x',
   // twitter: 'https://twitter.com/Twitter',
