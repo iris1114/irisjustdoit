@@ -6,7 +6,7 @@ const siteMetadata = {
   description: '前端旅遊紀錄生活的部落格',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://irisjustdoit.netlify.app/',
+  siteUrl: 'https://irisjustdoit.cc/',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
