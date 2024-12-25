@@ -1,0 +1,121 @@
+---
+title: 'Day28: Video Speed Controller'
+date: 2021-07-21
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 來實現視頻播放速度控制功能。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 來實現視頻播放速度控制功能。
+
+作品頁面：https://iris1114.github.io/javascript30/28_Video-Speed-Controller/
+
+### HTML
+
+- 包含一個 `div` 容器，內部有一個 `video` 元素和一個控制播放速度的 `div` 元素。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Video Speed Scrubber</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <video
+        class="flex"
+        width="765"
+        height="430"
+        src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
+        loop
+        controls
+      ></video>
+      <div class="speed">
+        <div class="speed-bar">1×</div>
+      </div>
+    </div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
+```
+
+### CSS
+
+- 設定了基本的頁面樣式，包括字體、顏色和佈局。
+- 設置了視頻播放速度控制的樣式。
+
+```css
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #333;
+  color: #fff;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.speed {
+  width: 50px;
+  height: 430px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 20px;
+  cursor: ns-resize;
+  position: relative;
+}
+
+.speed-bar {
+  width: 100%;
+  background: linear-gradient(to bottom, #ff0000, #ff9900);
+  text-align: center;
+  color: #fff;
+  font-size: 1.2rem;
+  position: absolute;
+  bottom: 0;
+}
+```
+
+### JavaScript
+
+- 使用 JavaScript 來實現視頻播放速度控制功能。
+
+```javascript
+const speed = document.querySelector('.speed')
+const bar = speed.querySelector('.speed-bar')
+const video = document.querySelector('.flex')
+
+// 當滑鼠移動時觸發
+function handleMove(e) {
+  const y = e.pageY - this.offsetTop
+  const percent = y / this.offsetHeight
+  const min = 0.4
+  const max = 4
+  const height = Math.round(percent * 100) + '%'
+  const playbackRate = percent * (max - min) + min
+  bar.style.height = height
+  bar.textContent = playbackRate.toFixed(2) + '×'
+  video.playbackRate = playbackRate
+}
+
+speed.addEventListener('mousemove', handleMove)
+```
+
+### 注意事項
+
+- 使用 `mousemove` 事件來監聽滑鼠移動。
+- 使用 `e.pageY` 來獲取滑鼠的垂直位置。
+- 使用 `video.playbackRate` 來設置視頻的播放速度。

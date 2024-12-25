@@ -1,0 +1,121 @@
+---
+title: 'Day27: Click and Drag'
+date: 2021-07-20
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 來實現點擊並拖動的效果。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 來實現點擊並拖動的效果。
+
+作品頁面：https://iris1114.github.io/javascript30/27_Click-and-Drag/
+
+### HTML
+
+- 包含一個 `div` 容器，內部有多個 `img` 元素，用於演示點擊並拖動的效果。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Click and Drag</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="items">
+      <img src="https://source.unsplash.com/random/800x600" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x601" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x602" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x603" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x604" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x605" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x606" alt="Random Image" />
+      <img src="https://source.unsplash.com/random/800x607" alt="Random Image" />
+    </div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
+```
+
+### CSS
+
+- 設定了基本的頁面樣式，包括字體、顏色和佈局。
+- 設置了點擊並拖動效果的樣式。
+
+```css
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f4f4f4;
+}
+
+.items {
+  display: flex;
+  overflow: hidden;
+  border: 2px solid #333;
+  width: 80%;
+  cursor: grab;
+}
+
+.items img {
+  max-width: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+```
+
+### JavaScript
+
+- 使用 JavaScript 來實現點擊並拖動的效果。
+
+```javascript
+const slider = document.querySelector('.items')
+let isDown = false
+let startX
+let scrollLeft
+
+// 當滑鼠按下時觸發
+slider.addEventListener('mousedown', (e) => {
+  isDown = true
+  slider.classList.add('active')
+  startX = e.pageX - slider.offsetLeft
+  scrollLeft = slider.scrollLeft
+})
+
+// 當滑鼠離開時觸發
+slider.addEventListener('mouseleave', () => {
+  isDown = false
+  slider.classList.remove('active')
+})
+
+// 當滑鼠放開時觸發
+slider.addEventListener('mouseup', () => {
+  isDown = false
+  slider.classList.remove('active')
+})
+
+// 當滑鼠移動時觸發
+slider.addEventListener('mousemove', (e) => {
+  if (!isDown) return
+  e.preventDefault()
+  const x = e.pageX - slider.offsetLeft
+  const walk = (x - startX) * 3 // 滑動的速度
+  slider.scrollLeft = scrollLeft - walk
+})
+```
+
+### 注意事項
+
+- 使用 `mousedown`、`mouseleave`、`mouseup` 和 `mousemove` 事件來實現點擊並拖動的效果。
+- 使用 `e.preventDefault()` 來防止默認行為。
+- 使用 `scrollLeft` 來控制滾動位置。

@@ -1,0 +1,72 @@
+---
+title: 'Day18: Adding Up Times with Reduce'
+date: 2021-07-11
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 的 reduce 方法來計算影片總時長。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 的 reduce 方法來計算影片總時長。
+
+作品頁面：https://iris1114.github.io/javascript30/18_Adding-Up-Times-with-Reduce/
+
+### HTML
+
+- 包含一個 `ul` 列表，內部有多個 `li` 元素，每個元素包含一個 `data-time` 屬性，表示影片的時長。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Videos</title>
+  </head>
+  <body>
+    <ul class="videos">
+      <li data-time="5:43">Video 1</li>
+      <li data-time="2:33">Video 2</li>
+      <li data-time="3:45">Video 3</li>
+      <li data-time="0:47">Video 4</li>
+      <li data-time="5:21">Video 5</li>
+      <li data-time="6:56">Video 6</li>
+      <li data-time="3:46">Video 7</li>
+      <li data-time="5:25">Video 8</li>
+      <li data-time="3:14">Video 9</li>
+    </ul>
+  </body>
+</html>
+```
+
+### JavaScript
+
+- 使用 JavaScript 來計算所有影片的總時長，並將結果顯示在控制台。
+
+```javascript
+const timeNodes = Array.from(document.querySelectorAll('[data-time]'))
+
+const seconds = timeNodes
+  .map((node) => node.dataset.time)
+  .map((timeCode) => {
+    const [mins, secs] = timeCode.split(':').map(parseFloat)
+    return mins * 60 + secs
+  })
+  .reduce((total, vidSeconds) => total + vidSeconds)
+
+let secondsLeft = seconds
+const hours = Math.floor(secondsLeft / 3600)
+secondsLeft = secondsLeft % 3600
+
+const mins = Math.floor(secondsLeft / 60)
+secondsLeft = secondsLeft % 60
+
+console.log(hours, mins, secondsLeft)
+```
+
+### 注意事項
+
+- 使用 `Array.from` 將 NodeList 轉換為陣列。
+- 使用 `map` 方法將時間轉換為秒數。
+- 使用 `reduce` 方法計算總秒數。
+- 使用 `Math.floor` 和模運算來計算小時、分鐘和剩餘秒數。

@@ -1,0 +1,114 @@
+---
+title: 'Day17: Sort Without Articles'
+date: 2021-07-10
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 排序陣列，忽略文章冠詞。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 排序陣列，忽略文章冠詞。
+
+作品頁面：https://iris1114.github.io/javascript30/17_Sort-Without-Articles/
+
+### HTML
+
+- 包含一個 `ul` 列表，用於顯示排序後的樂隊名稱。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sort Without Articles</title>
+  </head>
+  <body>
+    <ul id="bands"></ul>
+  </body>
+</html>
+```
+
+### CSS
+
+- 設定了基本的頁面樣式，包括字體、顏色和佈局。
+- `#bands` 列表設置了背景色、寬度、邊距和陰影效果。
+- `#bands li` 設置了邊框和內邊距。
+
+```css
+html {
+  font-family: sans-serif;
+  background: #ffc600;
+  color: #333;
+  font-size: 20px;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#bands {
+  list-style: inside square;
+  font-size: 20px;
+  background: white;
+  width: 500px;
+  margin: auto;
+  padding: 0;
+  box-shadow: 0 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+#bands li {
+  border-bottom: 1px solid #efefef;
+  padding: 20px;
+}
+
+#bands li:last-child {
+  border-bottom: 0;
+}
+
+a {
+  color: #ffc600;
+  text-decoration: none;
+}
+```
+
+### JavaScript
+
+- 使用 JavaScript 來排序樂隊名稱，忽略文章冠詞（如 "The", "A", "An"）。
+- 將排序後的樂隊名稱渲染到 `ul` 列表中。
+
+```javascript
+const bands = [
+  'The Plot in You',
+  'The Devil Wears Prada',
+  'Pierce the Veil',
+  'Norma Jean',
+  'The Bled',
+  'Say Anything',
+  'The Midway State',
+  'We Came as Romans',
+  'Counterparts',
+  'Oh, Sleeper',
+  'A Skylit Drive',
+  'Anywhere But Here',
+  'An Old Dog',
+]
+
+function strip(bandName) {
+  return bandName.replace(/^(a |the |an )/i, '').trim()
+}
+
+const sortedBands = bands.sort((a, b) => (strip(a) > strip(b) ? 1 : -1))
+
+document.querySelector('#bands').innerHTML = sortedBands.map((band) => `<li>${band}</li>`).join('')
+```
+
+### 注意事項
+
+- 使用正則表達式來移除樂隊名稱中的文章冠詞。
+- 使用 `Array.prototype.sort` 方法來排序樂隊名稱。
+- 使用 `Array.prototype.map` 方法來生成 HTML 列表項。

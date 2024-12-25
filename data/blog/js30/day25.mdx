@@ -1,0 +1,91 @@
+---
+title: 'Day25: Event Capture, Propagation, Bubbling and Once'
+date: 2021-07-18
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 來理解事件捕獲、傳播、冒泡和一次性事件。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 來理解事件捕獲、傳播、冒泡和一次性事件。
+
+作品頁面：https://iris1114.github.io/javascript30/25_Event%20Capture-Propagation-Bubbling-and-Once/
+
+### HTML
+
+- 包含多個嵌套的 `div` 元素，用於演示事件捕獲、傳播和冒泡。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Understanding JavaScript's Capture</title>
+  </head>
+  <body class="bod">
+    <div class="one">
+      <div class="two">
+        <div class="three"></div>
+      </div>
+    </div>
+
+    <style>
+      html {
+        box-sizing: border-box;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      div {
+        width: 100%;
+        padding: 100px;
+      }
+
+      .one {
+        background: thistle;
+      }
+
+      .two {
+        background: peachpuff;
+      }
+
+      .three {
+        background: lightblue;
+      }
+    </style>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
+```
+
+### JavaScript
+
+- 使用 JavaScript 來演示事件捕獲、傳播、冒泡和一次性事件。
+
+```javascript
+const divs = document.querySelectorAll('div')
+
+function logText(e) {
+  console.log(this.classList.value)
+  e.stopPropagation() // 停止事件冒泡
+}
+
+divs.forEach((div) =>
+  div.addEventListener('click', logText, {
+    capture: false, // 設置為 true 以啟用事件捕獲
+    once: true, // 事件處理器只運行一次
+  })
+)
+```
+
+### 注意事項
+
+- 使用 `e.stopPropagation()` 來停止事件冒泡。
+- 使用事件監聽器的選項 `{ capture: true }` 來啟用事件捕獲。
+- 使用事件監聽器的選項 `{ once: true }` 來使事件處理器只運行一次。

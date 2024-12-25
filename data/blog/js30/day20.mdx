@@ -1,0 +1,80 @@
+---
+title: 'Day20: Speech Detection'
+date: 2021-07-13
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 和 Web Speech API 來實現語音識別功能。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 和 Web Speech API 來實現語音識別功能。
+
+作品頁面：https://iris1114.github.io/javascript30/20_Speech-Detection/
+
+### HTML
+
+- 包含一個 `div` 容器，內部設置為可編輯，用於顯示語音識別結果。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Speech Detection</title>
+  </head>
+  <body>
+    <div class="words" contenteditable></div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
+```
+
+### JavaScript
+
+- 使用 JavaScript 和 Web Speech API 來實現語音識別功能，並將識別結果顯示在頁面上。
+
+```javascript
+// 獲取 SpeechRecognition 物件
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+const recognition = new SpeechRecognition()
+recognition.interimResults = true
+recognition.lang = 'en-US'
+
+let p = document.createElement('p')
+const words = document.querySelector('.words')
+words.appendChild(p)
+
+// 當有語音識別結果時觸發
+recognition.addEventListener('result', (e) => {
+  const transcript = Array.from(e.results)
+    .map((result) => result[0])
+    .map((result) => result.transcript)
+    .join('')
+
+  // 將不雅詞彙替換為表情符號
+  const poopScript = transcript.replace(/poop|poo|shit|dump/gi, '💩')
+  p.textContent = poopScript
+
+  // 如果結果是最終結果，則創建新的段落
+  if (e.results[0].isFinal) {
+    p = document.createElement('p')
+    words.appendChild(p)
+  }
+})
+
+// 當語音識別結束時重新啟動
+recognition.addEventListener('end', recognition.start)
+
+// 開始語音識別
+recognition.start()
+```
+
+### 注意事項
+
+- 使用 `window.SpeechRecognition` 或 `window.webkitSpeechRecognition` 來獲取 SpeechRecognition 物件。
+- 設置 `interimResults` 為 `true` 以獲取即時結果。
+- 使用 `addEventListener` 來監聽語音識別結果和結束事件。
+- 使用正則表達式來替換不雅詞彙。

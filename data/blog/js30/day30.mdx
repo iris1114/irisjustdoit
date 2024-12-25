@@ -1,0 +1,181 @@
+---
+title: 'Day30: Whack-A-Mole'
+date: 2021-07-23
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: '如何使用 JavaScript 來實現打地鼠遊戲。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 JavaScript 來實現打地鼠遊戲。
+
+作品頁面：https://iris1114.github.io/javascript30/30_Whack-A-Mole/
+
+### HTML
+
+- 包含一個 `div` 容器，內部有多個 `div` 元素，用於顯示地鼠。
+- 包含一個按鈕，用於開始遊戲。
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Whack-A-Mole</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Whack-A-Mole! <span class="score">0</span></h1>
+    <button class="start">Start!</button>
+    <div class="game">
+      <div class="hole hole1">
+        <div class="mole"></div>
+      </div>
+      <div class="hole hole2">
+        <div class="mole"></div>
+      </div>
+      <div class="hole hole3">
+        <div class="mole"></div>
+      </div>
+      <div class="hole hole4">
+        <div class="mole"></div>
+      </div>
+      <div class="hole hole5">
+        <div class="mole"></div>
+      </div>
+      <div class="hole hole6">
+        <div class="mole"></div>
+      </div>
+    </div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
+```
+
+### CSS
+
+- 設定了基本的頁面樣式，包括字體、顏色和佈局。
+- 設置了打地鼠遊戲的樣式。
+
+```css
+body {
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f4f4f4;
+  margin: 0;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+button.start {
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.game {
+  display: flex;
+  flex-wrap: wrap;
+  width: 600px;
+  height: 400px;
+  position: relative;
+}
+
+.hole {
+  width: 33.333%;
+  height: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mole {
+  width: 100px;
+  height: 100px;
+  background: url('mole.png') no-repeat center center;
+  background-size: contain;
+  position: absolute;
+  bottom: -100px;
+  transition: all 0.3s;
+}
+
+.hole.up .mole {
+  bottom: 0;
+}
+```
+
+### JavaScript
+
+- 使用 JavaScript 來實現打地鼠遊戲。
+
+```javascript
+const holes = document.querySelectorAll('.hole')
+const scoreBoard = document.querySelector('.score')
+const moles = document.querySelectorAll('.mole')
+const startButton = document.querySelector('.start')
+let lastHole
+let timeUp = false
+let score = 0
+
+// 隨機選擇一個洞
+function randomTime(min, max) {
+  return Math.round(Math.random() * (max - min) + min)
+}
+
+// 隨機選擇一個洞
+function randomHole(holes) {
+  const idx = Math.floor(Math.random() * holes.length)
+  const hole = holes[idx]
+  if (hole === lastHole) {
+    return randomHole(holes)
+  }
+  lastHole = hole
+  return hole
+}
+
+// 顯示地鼠
+function peep() {
+  const time = randomTime(200, 1000)
+  const hole = randomHole(holes)
+  hole.classList.add('up')
+  setTimeout(() => {
+    hole.classList.remove('up')
+    if (!timeUp) peep()
+  }, time)
+}
+
+// 開始遊戲
+function startGame() {
+  scoreBoard.textContent = 0
+  timeUp = false
+  score = 0
+  peep()
+  setTimeout(() => (timeUp = true), 10000)
+}
+
+// 打地鼠
+function bonk(e) {
+  if (!e.isTrusted) return // cheater!
+  score++
+  this.parentNode.classList.remove('up')
+  scoreBoard.textContent = score
+}
+
+moles.forEach((mole) => mole.addEventListener('click', bonk))
+startButton.addEventListener('click', startGame)
+```
+
+### 注意事項
+
+- 使用 `setTimeout` 來控制地鼠出現的時間。
+- 使用 `Math.random` 來隨機選擇洞和時間。
+- 使用 `addEventListener` 來監聽地鼠的點擊事件。

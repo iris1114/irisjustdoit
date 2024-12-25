@@ -1,0 +1,81 @@
+---
+title: 'Day15: LocalStorage'
+date: 2021-07-09
+tags: ['JavaScript30', 'tech']
+draft: false
+summary: 'JavaScript 中引用與複製的差異，並提供了多種複製陣列和物件的方法。'
+images:
+authors: ['chick_playground']
+---
+
+簡介： 如何使用 LocalStorage 來儲存和管理。
+
+作品頁面：https://iris1114.github.io/javascript30/15_LocalStorage/
+
+## HTML
+
+- 包含一個標題 `LOCAL TAPAS`。
+- 一個顯示項目的 `ul` 列表，初始內容為 `Loading Tapas...`。
+- 一個表單，包含一個輸入框和一個提交按鈕，用於添加新項目。
+
+```html
+<div class="wrapper">
+  <h2>LOCAL TAPAS</h2>
+  <p></p>
+  <ul class="plates">
+    <li>Loading Tapas...</li>
+  </ul>
+  <form class="add-items">
+    <input type="text" name="item" placeholder="Item Name" required />
+    <input type="submit" value="+ Add Item" />
+  </form>
+</div>
+```
+
+## JavaScript
+
+- 從 LocalStorage 中獲取已儲存的項目，並將其解析為 JavaScript 陣列。
+- 定義 `addItem` 函數，用於處理表單提交事件，將新項目添加到陣列中，並更新 LocalStorage。
+- 定義 `populateList` 函數，用於將項目渲染到 `ul` 列表中。
+
+```javascript
+const addItems = document.querySelector('.add-items')
+const itemsList = document.querySelector('.plates')
+const items = JSON.parse(localStorage.getItem('items')) || []
+
+function addItem(e) {
+  e.preventDefault()
+  const text = this.querySelector('[name=item]').value
+  const item = {
+    text,
+    done: false,
+  }
+
+  items.push(item)
+  populateList(items, itemsList)
+  localStorage.setItem('items', JSON.stringify(items))
+  this.reset()
+}
+
+function populateList(plates = [], platesList) {
+  platesList.innerHTML = plates
+    .map((plate, i) => {
+      return `
+      <li>
+        <input type="checkbox" data-index=${i} id="item${i}" ${plate.done ? 'checked' : ''} />
+        <label for="item${i}">${plate.text}</label>
+      </li>
+    `
+    })
+    .join('')
+}
+
+addItems.addEventListener('submit', addItem)
+populateList(items, itemsList)
+```
+
+### 注意事項
+
+- 使用 `localStorage.setItem` 和 `localStorage.getItem` 來儲存和獲取資料。
+- 使用 `JSON.stringify` 和 `JSON.parse` 來處理資料的序列化和反序列化。
+- 表單提交後會重置輸入框。
