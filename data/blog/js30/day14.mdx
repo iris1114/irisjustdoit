@@ -88,7 +88,7 @@ const dev = Object.assign({}, wes)
 const dev2 = JSON.parse(JSON.stringify(wes))
 ```
 
-## 注意事項
+## Note
 
 - 使用 `Object.assign()` 和展開運算子（spread operator）進行的複製都是淺層複製（shallow copy），僅複製第一層。如果物件中包含巢狀物件，內部的巢狀物件仍然是引用。
 - 深層複製（deep copy）可以使用 `JSON.parse(JSON.stringify(obj))` 或第三方函式庫如 lodash 的 `cloneDeep` 方法，但需謹慎使用。

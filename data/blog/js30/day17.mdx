@@ -107,7 +107,7 @@ const sortedBands = bands.sort((a, b) => (strip(a) > strip(b) ? 1 : -1))
 document.querySelector('#bands').innerHTML = sortedBands.map((band) => `<li>${band}</li>`).join('')
 ```
 
-### 注意事項
+### Note
 
 - 使用正則表達式來移除樂隊名稱中的文章冠詞。
 - 使用 `Array.prototype.sort` 方法來排序樂隊名稱。
