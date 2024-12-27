@@ -1,0 +1,183 @@
+---
+title: 'Day08:【TypeScript 學起來】物件型別 Object Types : object'
+date: 2021-10-18
+tags: ['ts30', 'tech']
+draft: false
+summary:上一篇紀錄了原始資料型別（Primitive Types），這一篇要來探險物件型別（Object types）咯～
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day08:【TypeScript 學起來】物件型別 Object Types : object
+
+> https://bit.ly/2XuVqBJ (這篇必看，不分享對不起自己)
+>
+> //原來南無觀世音菩薩可以這麼用 真的笑鼠我 今天來介紹object!
+
+---
+
+上一篇紀錄了原始資料型別（Primitive Types），這一篇要來探險物件型別（Object types）咯～ 包括了：object(物件) 、 arrays(陣列) 、function(函式)。
+
+## 定義 object 的方法：
+
+1. 一般 JSON 物件格式，讓TS自動推論(Type Inference)
+2. object 型別註記
+3. 手動定義物件屬性型別
+4. 使用 interface
+5. 使用 type
+
+我們今天會來介紹前面3種，較基本定義object的方式。但專案中較常用的會是 interface 及 type， 且這兩個除了可以定義object 之外，也能定義 array 及 function。
+
+---
+
+## 一般 JSON 物件格式
+
+像一般在 javascript 宣告物件應用在 TypeScript :
+
+```typescript=
+let person = {
+    name: "iris",
+    age: 18
+};
+```
+
+在 TypeScript 中會按照物件本身自動推論出資料型別(Type Inference)。
+
+![](https://i.imgur.com/nPapJa9.png)
+
+來修改看看物件會出現什麼狀況：
+
+```typescript=
+person.name = "aka 廢廢前端" //ok 型別相同
+person = {
+    name: "aa",  //ok 覆寫的物件格式必須完全相同
+    age: 20
+}
+
+person.name = false; // error: Type 'boolean' is not assignable to type 'string'.
+person.job = "在家躺" //error: Property 'job' does not exist on type
+person = {
+    name: "bb"   //error: Property 'age' is missing in type
+}
+person = {
+    gender : "male",
+    job : "在家躺"
+}//error: Type '{ gender: string; job: string; }' is not assignable to type '{ name: string; age: number; }'
+
+delete person.name; //可執行刪除屬性
+
+//tsconfig 開啟嚴謹模式 會報錯提醒
+delete person.name;//error: The operand of a 'delete' operator must be optional.
+```
+
+結論：
+
+- ✅ 覆寫的值需與屬性對應的型別相同
+- ✅ 對物件整體覆寫，其覆寫的物件格式必須完全相同
+- ❌ 不能隨意新增原先不存在該物件的屬性
+- ❌ 不能覆寫整個物件時的格式錯誤（少一個 key / 新增 key / key所對應的值型別錯誤）
+- ❓ 但如果 delete 屬性 TS 不會警告 ，還能夠進行刪除，不小心刪掉就GG
+- 補充：tsconfig 開啟嚴謹模式， compiler 會報錯提醒。
+
+---
+
+## object 型別註記
+
+除了 TypeScript 會自動推論物件型別外，我們也可以自己去定義物件變數：
+
+```typescript=
+let person2: object = {
+    name: "iris",
+    age: 18
+};
+```
+
+他跟一般 JSON 物件格式有什麼差別呢？
+
+```typescript=
+person2.name = "aka 廢廢前端" //error: Property 'name' does not exist on type 'object'.
+person2 = {
+    name: "aa",  //ok
+    age: 20
+}
+person2.name = false; // error: Property 'name' does not exist on type 'object'.
+person2.job = "在家躺" //error: Property 'job' does not exist on type 'object'.
+person2 = {
+    name: "bb"   //ok
+}
+person2 = {
+    gender : "male", //ok
+    job : "在家躺",
+}
+delete person2.name; //error: Property 'name' does not exist on type 'object'.
+```
+
+驚不驚喜，意不意外～我也沒想到，居然連值型別相同都不能覆寫。所以在定義object時只定義了 person2 為空object `{}` , 卻沒有細節屬性可以用 QQ
+
+結論：
+
+- ❌ 無法單獨對該物件屬性做覆寫，即使相同型別的值也無法
+- ❌ 無法單獨新增屬性
+- ❌ 無法刪除屬性
+- ✅ 可以完全覆寫整個物件（新增/減少屬性，即使型別完全不同都可以）
+
+---
+
+## 手動定義物件屬性型別
+
+雖然 TS 已經幫我們自動推論出型別，但也可以手動定義型別。感覺使用方法1，一般 JSON 物件格式，更方便快速吧，符合廢廢前端的特質 XD
+
+```javascript=
+let person3 : {name: string, age: number} = {
+    name: "iris",
+    age: 18
+}
+```
+
+## 在function中定義物件參數型別
+
+在function中定義參數型別，`person4: { name: string, age: number }` ，官網說也可使用分號去分隔參數如：`person4: { name: string; age: number }`。
+
+```javascript=
+const getUserInfo = (person4: { name: string, age: number }) =>{
+    console.log(` Hello, my name is ${person4.name}. I'm ${person4.age} years old.`);
+}
+
+getUserInfo({ name: "iris", age: 18 });
+```
+
+### 可選屬性 （Optional Properties）
+
+我們可以去指定部分或全部屬性為可選屬性，方法是在屬性名稱後面加上一個`?`。如下面例子，`age` 改為可選屬性，可輸入或不輸入。
+
+```javascript=
+const getUserInfo2 = (person5: { name: string, age?: number }) =>{
+    console.log(` Hello, my name is ${person5.name}. I'm ${person5.age} years old.`);
+}
+
+getUserInfo2({ name: "iris"}); //Hello, my name is iris. I'm undefined years old.
+```
+
+以上例子沒帶`age`參數雖然沒報錯，但函式內有用到`age`時他會回傳 `undefined`， 這樣也不是我們要的，我們在去針對`undefined`做判斷即可。
+
+```typescript=
+const getUserInfo2 = (person5: { name: string, age?: number }) =>{
+    if(person5.age !== undefined){
+        console.log(`Hello, my name is ${person5.name}. I'm ${person5.age} years old.`);
+    }else{
+        console.log(`Hello, my name is ${person5.name}.`);
+    }
+}
+
+getUserInfo2({ name: "iris"}); //Hello, my name is iris.
+getUserInfo2({ name: "iris", age: 18 }); //Hello, my name is iris. I'm 18 years old.
+```
+
+嗚嗚 終於寫完 object 了，原本預計本篇是要寫 object，array 及 function ， 但小編我已累，而且讀起來會太長，就下篇再寫 array 及 function了。耶！來去休息一下～
+
+---
+
+## 參考資料
+
+https://ithelp.ithome.com.tw/articles/10214840#h5o-8
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#object-types

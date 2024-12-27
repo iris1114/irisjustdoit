@@ -1,0 +1,254 @@
+---
+title: '鐵人賽Day01: 為什麼我想要學 TypeScript'
+date: 2021-10-11
+tags: ['ts30', 'tech']
+draft: false
+summary: 這是一篇欠了很久的開場，大概轉行不到1年的時候，就一直聽到 TypeScript 的名字，想說到底是啥
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day21:【TypeScript 學起來】Generics 泛型
+
+> 是說在社群到處都在爆雷的《魷魚遊戲》，我進度第一集，好想棄賽來追劇（我就廢
+> 然後謝謝沒看魷魚遊戲，不小心看到我文章的你～(還是你已經看完了
+>
+> 沒寫很好，當作筆記記錄，若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+泛型（Generics）是指在定義function、interfaces或class的時候，**不預先指定具體的型別而在使用的時候再指定型別的一種特性。**
+
+---
+
+## 什麼情況可以用？
+
+在前面介紹 array 型別的時候，除了使用「型別 + 方括號」來表示 array, 也可以使用泛型方式來表示。 讓我們複習一下：
+
+```javascript=
+//「型別 + 方括號」
+const list1: number[] = [1, 2, 3];
+//陣列泛型
+const list2: Array<number> = [1, 2, 3];
+```
+
+這個例子來看，我傳入參數的型別為number陣列型別，我們可以使用`Array<number>`，也可以使用 `number[]`， 返回值型別也是一樣的數字陣列型別。 所以當傳入`[1, 2, 3]`時是沒有問題的。
+
+```typescript=
+function identity(arg: Array<number>): Array<number> {
+  console.log(arg);
+  return arg;
+}
+
+identity([1, 2, 3]); // [1, 2, 3]
+
+```
+
+```typescript=
+function identity2(arg: number[]): number[] {
+  console.log(arg);
+  return arg;
+}
+
+identity2([1, 2, 3]); // [1, 2, 3]
+```
+
+如果我們希望他不僅能處理數字陣列，也能處理字串陣列，那該怎麼做呢？ >> 我們可以使用泛型，不預先指定具體的型別，在使用的時候再去指定或讓 compiler 自動推論。
+
+---
+
+## 泛型怎麼用？
+
+在函式後面加上 `<Type>` 表示動態型別，`<Type>` 命名也是可以自行定義的，如`<List>`。只是 `<T>` 及 `<Type>`比較通用。
+
+再指定 arg 參數為 `Type[]` 型別， 函式也回傳 `Type[]` 型別，那就能依據傳入型別去回傳該型別資料。當然你也可以只寫`Type`就可以了， 只是這個例子傳入及輸出型別都是陣列， 我們寫`Type[]`會更嚴謹，只傳入陣列型別。像如果是字串寫`Type`就可以了。
+
+```typescript=
+function identity3<Type>(arg: Type[]): Type[] {
+  return arg;
+}
+
+let output1 = identity3([1, 2, 3]);
+let output2 = identity3(["a", "b", "c"]);
+console.log(output1);// [1, 2, 3]
+console.log(output2); //["a","b","c"]
+```
+
+我們在調用函式的時候，可以將參數型別傳給函式，如希望他是使用 `<type>` 如下方例子 `identity3<string>(["a", "b", "c"])`，指定參數型別為 `string` 。 或是讓 TypeScript 自動推論（type argument inference ）出來，這個方法最常見，當然選這個呀，方便 XD
+
+```typescript=
+let output3 = identity3<string>(["a", "b", "c"]); //指定泛型回傳型別 `<type>`
+let output4 = identity3(["a", "b", "c"]); //inference
+console.log(output3); // [ 'a', 'b', 'c' ]
+console.log(output4); // [ 'a', 'b', 'c' ]
+```
+
+---
+
+## 多個參數情況
+
+一樣使用`<T, U>` 自定義，並對應到參數的型別就可以了。
+
+```typescript=
+function makeTuple<T, U>(tuple: [T, U]): [T, U] {
+  return [tuple[0], tuple[1]];
+}
+
+const tuple1 = makeTuple([1, "a"]);
+console.log(tuple1); //[ 1, 'a' ]
+
+```
+
+順便試看了 arrow function 寫法 :
+
+```typescript=
+const makeTuple2 = <T, U>(tuple: [T, U]): [T, U] => {
+  return [tuple[0], tuple[1]];
+}
+
+const tuple2 = makeTuple2([1, "a"]);
+console.log(tuple2); //[ 1, 'a' ]
+```
+
+⚠ arrow function 能在 .ts 但不能在 .tsx 中使用， 因為 tsx 中， TS compiler 會無法清楚區分 <> 是指 JSX 或 Generics Type， 所以當需要在函式中定義泛型時，就直接使用傳統的 Function Statement。
+
+---
+
+## Generic Constraints 泛型約束
+
+在函式內部使用泛型變數的時候，由於事先不知道它是哪種型別，所以不能隨意的操作它的屬性或方法，如下方例子，泛型 T 不一定包含屬性 `length`，所以編譯的時候報錯了。
+
+```typescript=
+function loggingIdentity<T>(arg: T): T {
+    console.log(arg.length);
+    return arg;
+}
+
+//error:Property 'length' does not exist on type 'T'.
+```
+
+這時，我們可以對泛型進行約束，我們使用了 `extends` 約束了泛型 T 必須符合介面 `Lengthwise` 的形狀，也就是必須包含 `length` 屬性。下方例子， 如果我們帶入的型別不符 `Lengthwise` 型別，就會報錯提醒。
+
+```typescript=
+interface Lengthwise {
+    length: number;
+}
+
+function loggingIdentity2<T extends Lengthwise>(arg: T): T {
+    console.log(arg.length);
+    return arg;
+}
+
+loggingIdentity2(3); //error: Argument of type 'number' is not assignable to parameter of type 'Lengthwise'.
+loggingIdentity2({ length: 10, value: 3 });
+```
+
+![](https://i.imgur.com/HZrgQQo.png)
+
+---
+
+## Using Type Parameters in Generic Constraints
+
+可以指定受另一個型別約束的參數型別， 如 Key 收到 Type 的型別約束， 所以 key參數型別只能是 obj參數所定義的型別。
+
+如下面例子 ` getProperty(x, "m")`時， 就會報錯提醒沒有 m 參數。
+
+```typescript=
+function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) {
+  return obj[key];
+}
+
+let x = { a: 1, b: 2, c: 3, d: 4 };
+
+let value1 = getProperty(x, "a");
+let value2 = getProperty(x, "m"); //error: Argument of type '"m"' is not assignable to parameter of type '"a" | "b" | "c" | "d"'.
+
+console.log(value1); //1
+console.log(value2); //undefined
+```
+
+---
+
+## Generic Interface
+
+含有泛型的介面來定義函式的形狀：
+
+```typescript=
+nterface GenericIdentityFn {
+  <Type>(arg: Type): Type;
+}
+
+function identityFn<Type>(arg: Type): Type {
+  return arg;
+}
+
+let myIdentity: GenericIdentityFn = identityFn;
+
+let result = myIdentity([1, 2, 3]);
+console.log(result); //[ 1, 2, 3 ]
+```
+
+可以把泛型引數提前到介面名上：
+
+```typescript=
+interface GenericIdentityFn2<Type> {
+  (arg: Type): Type;
+}
+
+function identityFn2<Type>(arg: Type): Type {
+  return arg;
+}
+
+let myIdentity2: GenericIdentityFn2<number> = identityFn2;
+
+
+let result2 = myIdentity2(123);
+console.log(result2); //123
+
+```
+
+⚠ 在使用泛型介面的時候，需要定義泛型的型別。
+
+---
+
+## Generic Classes
+
+泛型也可以用於類別的型別定義中：
+
+```typescript=
+class GenericNumber<NumType> {
+  zeroValue: NumType;
+  add: (x: NumType, y: NumType) => NumType;
+}
+
+//限制為 number 型別
+let myGenericNumber = new GenericNumber<number>();
+myGenericNumber.zeroValue = 0;
+myGenericNumber.add = function (x, y) {
+  return x + y;
+};
+
+console.log(myGenericNumber.add(myGenericNumber.zeroValue, 123)); //123
+
+
+//限制為 string 型別
+let stringNumeric = new GenericNumber<string>();
+stringNumeric.zeroValue = "";
+stringNumeric.add = function (x, y) {
+  return x + y;
+};
+
+console.log(stringNumeric.add(stringNumeric.zeroValue, "test")); //test
+```
+
+---
+
+> 感謝閱讀， 明天見！
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/advanced/generics
+https://www.typescriptlang.org/docs/handbook/2/generics.html
+https://pjchender.dev/typescript/ts-generics#%E5%9F%BA%E6%9C%AC%E8%AA%9E%E6%B3%95

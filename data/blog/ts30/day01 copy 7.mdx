@@ -1,0 +1,116 @@
+---
+title: 'Day07:【TypeScript 學起來】原始資料型別 Primitive Types'
+date: 2021-10-17
+tags: ['ts30', 'tech']
+draft: false
+summary:
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day07:【TypeScript 學起來】原始資料型別 Primitive Types
+
+> Q: 軟體工程師最常說的謊言有哪些？
+> A: //TODO
+> 連假結束 wednesday blue 啥都不想做 XDDD
+
+---
+
+## string (字串)
+
+使用 string 定義字串型別：
+
+```typescript=
+const myName: string = 'iris';
+const myAge: number = 18;
+
+const sentence: string = `Hello, my name is ${myName}.
+I'll be ${myAge + 1} years old next month.`;
+```
+
+---
+
+## number (數值)
+
+使用 number 定義數值型別：
+
+```typescript=
+const decLiteral: number = 6;
+const notANumber: number = NaN;
+const infinityNumber: number = Infinity;
+```
+
+---
+
+## boolean (布林值)
+
+使用 boolean 定義布林值型別：
+
+```typescript=
+const isDone: boolean = false;
+```
+
+---
+
+## null & undefined
+
+在 JavaScript 中，null 是已經賦予值， 而值為空值。 undefined 則是宣告了未被賦值。
+
+在 TypeScript 中， 這兩個值的運用取決於 [tsconfig ](https://www.typescriptlang.org/tsconfig#strictNullChecks) 中是否設定了嚴格檢查strictNullChecks。而 strictNullChecks 的預設是 false。
+
+但如果打開了`"strict": true`（預設會打開）, 則啟用所有嚴格類型檢查選項，包含strictNullChecks。
+
+如何產生及設定 tsconfig 請參考 [day05](https://ithelp.ithome.com.tw/articles/10263795)。
+
+### strictNullChecks off
+
+我們先把 strictNullChecks 設定為 false，這時候可以賦值給其他型別為 null 或 undefined。
+
+null:
+
+```typescript=
+const n: null = null;
+//如:賦值給string型別
+const city: string = n;
+console.log("city", city);
+```
+
+undefined:
+
+```typescript=
+const u: undefined = undefined;
+//如:賦值給number型別
+const price: number = u;
+console.log("price", price);
+```
+
+### strictNullChecks on
+
+這時候我們就可以在檔案上看到會報錯，`Type 'null' is not assignable to type 'string'.`
+在嚴格檢查下， 是不能賦值給其他型別的。
+
+![](https://i.imgur.com/sINitMo.png =500x)
+
+### 報錯了那怎麼辦？
+
+若在嚴格檢查模式下, 達到 false 的效果， 我們就需要用到 Union Types (聯合型別)，讓值可以有多種型別。
+
+```typescript=
+const n2: null = null;
+const city2: string | null  = n2; //可以是string 或者 null
+const city3: string | null  = "taipei";
+
+const u2: undefined = undefined;
+const price2: number | undefined  = u2; //可以是number 或者 undefined
+const price3: number | undefined  = 100;
+```
+
+> 耶 Primitive Types 搞定，沒想到 null & undefined寫那麼多，Union Types (聯合型別)後面也會再詳細介紹，接下來我們來看看 Object Types 了～
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/basics/primitive-data-types
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html
+https://www.typescriptlang.org/zh/tsconfig#strictNullChecks

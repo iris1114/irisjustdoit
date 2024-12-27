@@ -1,0 +1,140 @@
+---
+title: 'Day02: Hello TypeScript! 環境安裝起來 + 牛刀小試～'
+date: 2021-10-12
+tags: ['ts30', 'tech']
+draft: false
+summary: 在安裝 TypeScript 執行環境前，我們先來確認是否已安裝好 node.js，如果還沒安裝
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day02: Hello TypeScript! 環境安裝起來 + 牛刀小試～
+
+> Q: 同事說自己的 C++ 能力是世界第一，怎麼樣可以讓他意識到他沒那麼厲害呢？
+> A: 實不相瞞，我也不是省油的燈：我的C++實力世界第0
+>
+> XDD 好 今天的重點是環境安裝啦 是說好開心 今天上完班 就開啟第0天連假了(誤
+
+---
+
+## 安裝 node.js 與檢查
+
+在安裝 TypeScript 執行環境前，我們先來確認是否已安裝好 node.js，如果還沒安裝，可以到[node.js 官方網站](https://nodejs.org/en/) 官方網站進行下載安裝，建議是使用左邊 LTS 版本唷，相對比較穩定。 如果想要管理不同版本的 node 及 npm 也可以使用 [nvm](https://github.com/nvm-sh/nvm) 來安裝。
+
+安裝 node.js 時自動會安裝 npm，安裝成功後，可以輸入指令來檢查版號，看是否安裝成功。
+
+```
+node -v
+npm -v
+```
+
+如果都有出現版號（如 v14.1），就表示安裝成功啦。
+
+---
+
+## 安裝 TypeScript
+
+在全域環境安裝 TypeScript 指令，之後就可以在任何地方執行 `tsc` 指令了。
+
+```
+npm install -g typescript
+```
+
+一樣來檢查是否安裝成功。
+
+```
+tsc -v
+```
+
+一樣如果有出現版號（如 Version 4.3.5），就表示安裝成功啦。
+
+補充： TypeScript 除了可以使用 npm 安裝（當然也可以用 yarn）之外，還有 Visual Studio Extension 可以安裝， [可參考官網](https://www.typescriptlang.org/download)。
+
+---
+
+## 建立第一個 TypeScript 檔案
+
+在資料夾裡建立 `hello.ts` 的檔案，TypeScript 編寫的檔案都以 `.ts` 為字尾，如果是用 TypeScript 編寫 React 時，以 `.tsx` 為字尾。
+
+接下來在 `hello.ts` ， 我們可以來試看看 TypeScript 提供的型別註記 (Type Annotation) 的功能指定參數型別， 在 `person` 參數添加 `: string` ， 即定義 `person` 這個參數的資料型別得是字串型別：
+
+```javascript
+function sayHello(person: string) {
+  return "Hello, " + person;
+}
+
+let user = "iris";
+console.log(sayHello(user));
+```
+
+然後在終端機執行
+
+```
+tsc hello.ts
+```
+
+這時候我們就會看到編譯好的 `hello.js`:
+
+```javascript=
+function sayHello(person) {
+    return "Hello, " + person;
+}
+var user = "iris";
+console.log(sayHello(user));
+```
+
+這時候我們就完成第一個 TypeScript 檔案了～
+
+那來測試看看有沒有印出來， 在終端機執行
+
+```
+node hello.js
+```
+
+在終端機有印出 `Hello, iris`， 就表示成功啦！
+
+---
+
+## TypeScript 會告訴你寫錯了 ， JavaScript 不會
+
+接下來我們故意來輸入不同型別，看會怎麼樣～我們試著把傳入 sayHello 的參數改為 array 型別 `[0, 1, 2]`：
+
+```javascript=
+function sayHello(person: string) {
+    return 'Hello, ' + person;
+}
+
+let user = [0, 1, 2];
+console.log(sayHello(user));
+```
+
+![](https://i.imgur.com/spbaDOV.png)
+
+會發生什麼事呢？ TypeScript 會報錯， 告訴你這個參數只接受 string 型別， 不接受數字陣列。
+
+接下來發揮一下實驗精神，一樣再在終端機執行：
+
+```
+tsc hello.ts
+```
+
+即使終端機有報錯，但我們可以看到 TypeScript 還是有進行編譯產生 hello.js 。我們再執行：
+
+```
+node hello.js
+```
+
+印出了 `Hello, 1,2,3 `，但這不是我們所要的資料型別，不符我們預想。而 TypeScript 在開發的時候就會告訴我們不是 `string` 型別，方便我們快速 debug，但是 JavaScript 不會。
+
+⚠ TypeScript 只會進行靜態檢查，如果發現有錯誤，編譯的時候就會報錯。特別注意，TypeScript 編譯的時候即使報錯了，但還是會產生 js 檔案。如果要在報錯的時候終止 js 檔案的產生，可以在 tsconfig.json 中配置 noEmitOnError 即可。（我們之後會來介紹 tsconfig.json）
+
+---
+
+> 這篇我們試看了使用 TypeScript 帶來的好處，但有沒有發現每寫一次，我們都要手動去 tsc `xx.ts` 跟 node `xx.js` 一次， 超麻煩的，於是 google 找到了好方法，下篇來分享！
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html
+https://willh.gitbook.io/typescript-tutorial/introduction/get-typescript

@@ -1,0 +1,313 @@
+---
+title: 'Day14:【TypeScript 學起來】Interfaces(介面) 筆記大全'
+date: 2021-10-24
+tags: ['ts30', 'tech']
+draft: false
+summary: 筆記大全自己講 XD 終於來到 interface，覺得這個算是頗重要的一趴，讓我們看下去。這大概是我最認真做筆記的一篇 哈哈。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day14:【TypeScript 學起來】Interfaces(介面) 筆記大全
+
+> 筆記大全自己講 XD 終於來到 interface，覺得這個算是頗重要的一趴，讓我們看下去。這大概是我最認真做筆記的一篇 哈哈。 因為一開始學一直看到他，從一開始不懂到大概了解，到後面更了解一點，所以筆記也加加改改的，如果有錯也歡迎留言告訴我～
+
+---
+
+## interfaces(介面)
+
+在 TypeScript 中，我們使用介面（Interfaces）來定義物件的型別，對物件的形狀(shape)進行描述，包含了有哪些屬性 (properties) 和方法 (methods)。
+
+在物件導向程式語言中，介面（Interfaces）是一個很重要的概念，它是對行為的一種抽象，而具體如何行動則需要由類別（class）去實現（implement）。 class 後面會再筆記～
+
+---
+
+## 定義一個 interfaces
+
+✅ 定義一個介面 Person，接著定義了一個變數 iris，它的型別是 IPerson。就約束了 iris 的形狀必須和介面 IPerson 一致。 介面一般首字母大寫如 `Person`， 則有些語言會建議加上`I`字首如`IPerson` 來表示。賦值的時候，變數的形狀必須和介面的形狀保持一致。
+
+```javascript=
+interface IPerson {
+    name: string;
+    age: number;
+}
+
+const iris: IPerson = {
+    name: 'Iris',
+    age: 18
+};
+```
+
+❌ 變數比介面多或少一些屬性是不允許的。
+
+```javascript=
+const iris: IPerson = {
+    name: 'Iris'
+};
+//error: Property 'age' is missing in type '{ name: string; }' but required in type 'Person'.ts(2741)
+
+
+const iris: IPerson = {
+    name: 'Iris',
+    age: 18,
+    gender: 'female'
+};
+//error: Type '{ name: string; age: number; gender: string; }' is not assignable to type 'Person'.
+//Object literal may only specify known properties, and 'gender' does not exist in type 'Person'.
+```
+
+---
+
+## 如果不想寫年齡可以嗎 - 可選屬性 `？`
+
+在不需要完全匹配的屬性後面加上`?`，表示該屬性可以不存在。如下面例子，少了`age` 屬性賦值也不會報錯。
+
+```javascript=
+interface IPerson {
+    name: string;
+    age?: number;
+}
+
+const iris: Person = {
+    name: 'Iris'
+};
+```
+
+---
+
+## 但還是一樣不能新增減少未定義的屬性
+
+如果一樣想要新增性別，還是會報錯。
+
+```javascript=
+interface IPerson {
+    name: string;
+    age?: number;
+}
+
+const iris: IPerson = {
+    name: 'Iris',
+    gender: 'female'
+};
+//error: Type '{ name: string; age: number; gender: string; }' is not assignable to type 'Person'.
+//Object literal may only specify known properties, and 'gender' does not exist in type 'Person'.
+```
+
+---
+
+## 如果要新增任意屬性 怎麼新增呢 - Index Signatures
+
+Index Signatures 就是當我們有時候事先並不知道屬性名稱，或是未來會新增屬性，但知道值的形狀。我們就可以使用 Index Signatures 來描述值可能的型別。
+
+如以下例子， 使用`[propName: string]`定義了key， 屬性名稱為字串，賦值時可自行命名。對應的值 value 的型別為 string 或者 number 或是 undefined 。
+
+```typescript=
+interface IPerson {
+    name: string;
+    age?: number;
+    [propName: string]: string | number | undefined;
+}
+
+const iris5: IPerson = {
+    name: 'Iris',
+    gender: 'female'
+};
+```
+
+針對 Index Signatures， 我也會再寫一篇筆記唷，他有些用法新手誰知道啦XD
+
+---
+
+## 唯讀屬性 `readonly`
+
+可以用 `readonly` 定義唯讀屬性，唯讀的約束存在於第一次給「物件」賦值的時候,而不是第一次給「唯讀屬性」賦值的時候。
+
+```javascript=
+interface IPerson {
+    readonly id: number; //唯讀約束
+    name: string;
+    age?: number;
+    [propName: string]: any;
+}
+
+const iris: IPerson = {
+    id: 89757, //如果沒給則報錯 Property 'id' is missing in type
+    name: 'Iris',
+    gender: 'female'
+};
+```
+
+如果我們來修改id, 這時候就會報錯：
+
+```javascript=
+iris.id = 9527;
+
+// error: Cannot assign to 'id' because it is a read-only property.
+```
+
+---
+
+## interface 應用在函式中
+
+在` greetPerson` 函式中， `person` 參數型別為 `IPerson`, 便可以取用 `IPerson` 的屬性了。
+
+```typescript=
+interface IPerson {
+    readonly id: number;
+    name: string;
+    age?: number;
+    [propName: string]: any;
+}
+
+const iris: IPerson = {
+    id: 89757,
+    name: 'Iris',
+    gender: 'female'
+};
+
+const greetPerson = (person : IPerson) => {
+    console.log(`hi,${person.name}!`);
+}
+
+greetPerson(iris);//hi,Iris!
+```
+
+---
+
+## Extending Types 擴展
+
+interface 也可以被擴展。比如說我們有 BasicAddress 的型別， 但如果專案中某個區域地址多了 unit，我們就可以使用 extends 來多增加 unit 的欄位，是蠻方便+簡潔的～
+
+```typescript=
+interface BasicAddress {
+  name?: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
+
+interface AddressWithUnit extends BasicAddress {
+  unit: string;
+}
+```
+
+interface 也可以擴展多個 interface:
+
+```typescript=
+interface Colorful {
+  color: string;
+}
+
+interface Circle {
+  radius: number;
+}
+
+interface ColorfulCircle extends Colorful, Circle {
+    background: string;
+}
+
+const cc: ColorfulCircle = {
+  color: "red",
+  radius: 42,
+  background: "white"
+};
+```
+
+---
+
+## interface 可以重複定義
+
+以下例子，可以看到, 當少了gender屬性會報錯。因為TS已把 `IPerson` 的 interface 都合併起來了。
+
+```typescript=
+interface IPerson {
+    name: string;
+}
+
+interface IPerson {
+    age?: number;
+}
+
+interface IPerson {
+    gender: string;
+}
+
+const iris:IPerson = {
+    name: 'Iris',
+    age: 18
+}
+
+//error:Property 'gender' is missing in type '{ name: string; age: number; }' but required in type 'IPerson6'
+
+```
+
+重複相同的interface 名稱， TS會進行合併，等同於：
+
+```typescript=
+interface IPerson {
+    name: string;
+    age: number;
+    gender: string;
+}
+```
+
+---
+
+## interface 還可以定義陣列及函式
+
+我們都知道interface 可以來定義 object，還可以定義 object 的子型別，包括陣列及函式。
+
+Array:
+
+```typescript=
+interface INumberArray {
+    [index: number]: number;
+}
+const list: INumberArray = [1, 1, 2, 3, 5];
+```
+
+Function:
+
+```typescript=
+interface IPersonFunc {
+  (name: string, age: number): void;
+}
+```
+
+---
+
+## interface 可以 function overload
+
+interface 也可以定義 function overload。 function overload 是指擴充一個函式可以被執行的形式。
+
+```typescript=
+interface IPoint {
+    getDist(): number;
+    getDist(x?: number): number;
+}
+
+const point:IPoint = {
+    getDist(x?: number) {
+         if (x && typeof x == "number") {
+             return x;
+         } else {
+             return 0;
+         }
+    }
+}
+
+console.log(point.getDist(20)); //20
+console.log(point.getDist()); //0
+```
+
+---
+
+> 耶，覺得更了解 interfaces 了。讚讚， 下篇來介紹跟 interfaces 很像的 Type Aliases(型別別名) 。
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/basics/type-of-object-interfaces
+https://basarat.gitbook.io/typescript/type-system/interfaces

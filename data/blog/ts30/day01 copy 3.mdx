@@ -1,0 +1,120 @@
+---
+title: 'Day03:【TypeScript 學起來】自動編譯 tsc + nodemon 好方便'
+date: 2021-10-13
+tags: ['ts30', 'tech']
+draft: false
+summary: 上一篇有提到，我們每寫一次都要手動 tsc `xx.ts` 跟 node `xx.js`， 是不是很累，我就是很累，所以來分享這篇，讓我們可以自動編譯，加速學習時間。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day03:【TypeScript 學起來】自動編譯 tsc + nodemon 好方便
+
+> 老婆："下班後買十個包子回來，如果看到賣西瓜的就買一個。"
+> 老公："好。" (下班後帶著一個包子回家)
+> 老婆："為什麼只有一個包子？"
+> 老公："因為我看到賣西瓜的。"
+>
+> // 哈哈哈 這個超經典的 這不是笑話 根本就是日常會發生的事啦 XD
+
+---
+
+上一篇有提到，我們每寫一次都要手動 tsc `xx.ts` 跟 node `xx.js`， 是不是很累，我就是很累，所以來分享這篇，讓我們可以自動編譯，加速學習時間。
+
+1. 新增2個資料夾 `src` 及 `dist`
+
+2. 在 `src` 檔案新增 `index.ts`, 並寫入：
+
+```typescript=
+const index:string = "this's index";
+console.log(index);
+```
+
+3. 資料夾架構會長這樣：
+
+```
+project
+
+└───dist
+│   │
+│
+└───src
+    │   index.ts
+```
+
+4. 我們在資料夾初始化專案， 執行 npm 起手式：
+
+```
+npm init -y
+```
+
+5. 執行下方指令，就會產生 tsconfig.json 檔案，是 TS 初始化設置文件。
+
+```
+tsc --init
+```
+
+6. 打開 tsconfig.json，設定 outDir 及 rootDir 的路徑。
+
+```json
+"outDir": "./dist", //完成編譯後生成 js 文件的路徑
+"rootDir": "./src",   //代表 ts 文件的入口路徑
+```
+
+7. 執行`tsc`，會看見編譯後的`index.js`在`dist`的資料夾。
+
+```
+tsc
+```
+
+8. 執行下方指令， 安裝 nodemon 及 concurrently：
+
+```
+npm i nodemon concurrently --save-dev
+```
+
+9. 在 package.json 修改 script 的指令。
+
+```json=
+  "scripts": {
+    "start:build": "tsc -w",  //watch src的ts檔並自動編譯js檔
+    "start:run": "nodemon ./dist/index.js", //當有新的js檔產生則去執行
+    "start": "concurrently npm:start:*" //執行全部含有start的指令（包含 start:build 及 start:run）
+  },
+```
+
+10. 執行 ：
+
+```
+npm start
+```
+
+11. 此時，我們可以看到dist資料夾已編譯好js檔， 且在終端機也印出了 `this's index`， 表示執行成功～
+
+```
+project
+│   node_modules
+│   package-lock.json
+│   package.json
+│   tsconfig.json
+│
+└───dist
+│   │   index.js
+│
+└───src
+    │   index.ts
+```
+
+![](https://i.imgur.com/uwn998F.png =500x)
+
+是不是很方便～demo可看[這裏](https://github.com/iris1114/typescript-learning/tree/main/day03)， 我有同步在github。
+
+---
+
+> 這一篇設定在 tsconfig.json 設定了 outDir 及 rootDir ，下一篇就來筆記 tsconfig.json 還有哪些設定。 因為剛開始在看 handbook 介紹型別時發現他有提到 tsconfig，但那時我根本懵查查，決定把他挪到前面講， 後面看就會比較順～
+
+---
+
+## 參考資料
+
+https://www.typescripttutorial.net/typescript-tutorial/nodejs-typescript/

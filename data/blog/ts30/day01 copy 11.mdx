@@ -1,0 +1,157 @@
+---
+title: 'Day11:【TypeScript 學起來】只有 TS 才有的型別 : Union Types(聯合型別) /  Intersection Types (交集型別)'
+date: 2021-10-21
+tags: ['ts30', 'tech']
+draft: false
+summary: 今天來筆記Union Types(聯合型別) 及 Intersection types (交叉型別)。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day11:【TypeScript 學起來】只有 TS 才有的型別 : Union Types(聯合型別) / Intersection Types (交集型別)
+
+> 四個工程師一起坐上了車，發現車子發不動了。
+> 機械工程師說： 看來是引擎出問題了。
+> 電機工程師說： 看來車上的電子系統出問題了。
+> 化學工程師說： 可能是汽油內容物比例有問題。
+> 資訊工程師說： 我們試試看下車再上車一次好不好。
+>
+> XDDDD 笑屎
+>
+> 今天來筆記Union Types(聯合型別) 及 Intersection types (交叉型別)。
+
+---
+
+## Union Types(聯合型別)
+
+聯合型別（Union Types）表示取值可以為多種型別中的其中一種。跟JavaScript `||` or 的概念是一樣的。
+
+✅ 聯合型別使用 `|` 分隔每個型別。允許 id 的型別是 string 或者 number，但是不能是其他型別。
+
+```javascript=
+function printId(id: number | string) {
+  console.log("Your ID is: " + id);
+}
+printId(101); //ok
+printId("202"); //ok
+
+```
+
+❌ 若使用 boolean 值， 就會報錯。
+
+```javascript=
+
+// Error
+printId({ myID: 22342 });
+// error : Argument of type '{ myID: number; }' is not assignable to parameter of type 'string | number'.Type '{ myID: number; }' is not assignable to type 'number'.
+```
+
+---
+
+### 存取聯合型別的屬性或方法
+
+當 TypeScript 不確定一個聯合型別的變數到底是哪個型別的時候，我們只能存取此聯合型別的所有型別裡共有的屬性或方法。
+
+✅ 使用兩種型別都有的屬性時， 沒問題。
+
+```javascript=
+function printId(id: number | string) {
+    console.log(id.toString());
+}
+```
+
+❌ 如果使用不同屬性，則會報錯， `toUpperCase` 屬性無法適用於數值型別。
+
+```javascript=
+function printId(id: number | string) {
+  console.log(id.toUpperCase());
+}
+
+//error: Property 'toUpperCase' does not exist on type 'string | number'.
+//Property 'toUpperCase' does not exist on type 'number'.
+```
+
+✅ 若要解決不同情境，可以使用`typeof`去做判斷。官網將這些情況限縮某個具體型別上的行為，稱作為 Narrowing。
+
+```javascript=
+function printId2(id: number | string) {
+  if (typeof id === "string") {
+    //型別為字串才 toUpperCase
+    console.log(id.toUpperCase());
+  } else {
+    //其他自動判定為 number 型別
+    console.log(id);
+  }
+}
+printId2("ABC");
+```
+
+✅ 若是陣列型別與其他型別聯合， 可以使用`Array.isArray()`來檢查傳入的值是否為一個 Array。
+
+```javascript=
+function welcomePeople(x: string[] | string) {
+    if (Array.isArray(x)) {
+      console.log("Hello, " + x.join(" and "));
+    } else {
+      console.log("Welcome lone traveler " + x);
+    }
+}
+welcomePeople(["a","b","c"]);
+```
+
+---
+
+## Intersection Types (交集型別)
+
+交集型別(Intersection Type) 跟 JavaScript 的 `&&` and 概念相同， 使用`&` 表示其定義的值都必須同時符合兩種型別。
+
+❌ 以下面的例子，Intersection 在 primitive type（原始型別）中使用，是無法同時滿足兩種型別的，會被認定為 never 型別。
+
+```typescript=
+function printId(id: number & string) {
+  console.log("Your ID is: " + id);
+}
+printId(101); //error
+printId("202"); //error
+
+```
+
+![](https://i.imgur.com/toAybU5.png)
+
+✅ 主要用來組合現有的型別，若都沒符合兩種型別，則會報錯提醒。而且像下面的例子，`ColorfulCircle` 需滿足 `Colorful` 及 `Circle` 型別。 而且 TS 很聰明，`radius`寫錯字寫成 `raidus`，complier 也會報錯提醒， 真心覺得很棒！
+
+```typescript=
+interface Colorful {
+  color: string;
+}
+
+interface Circle {
+  radius: number;
+}
+
+//用type aliases 宣告 ColorfulCircle 型別，需滿足 Colorful 及 Circle 型別
+type ColorfulCircle = Colorful & Circle;
+
+//帶入的參數需滿足 ColorfulCircle 型別
+function draw(circle: ColorfulCircle) {
+  console.log(`Color was ${circle.color}`);
+  console.log(`Radius was ${circle.radius}`);
+}
+
+draw({ color: "blue", radius: 42 });// ok
+draw({ color: "red", raidus: 42 }); //error
+```
+
+![](https://i.imgur.com/660p9js.png)
+
+> 邊學習邊紀錄的測試例子，不嫌棄可[參考這裡](https://github.com/iris1114/typescript-learning/blob/main/day11/src/index.ts)。
+>
+> Day11 完成， 明天繼續 TypeScript 才有的型別。鐵人賽真是不容易，雖然累，但有學到東西還是蠻開心的啦。
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
+https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+https://www.typescriptlang.org/docs/handbook/2/objects.html#intersection-types

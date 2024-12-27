@@ -1,0 +1,248 @@
+---
+title: '鐵人賽Day01: 為什麼我想要學 TypeScript'
+date: 2021-10-11
+tags: ['ts30', 'tech']
+draft: false
+summary: 這是一篇欠了很久的開場，大概轉行不到1年的時候，就一直聽到 TypeScript 的名字，想說到底是啥
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day24 :【TypeScript 學起來】TypeScript 中使用 Class
+
+> 今天來了解在 TypeScript 中使用 Class，Class Member 包含了： Fields 、 Readonly、Constructors、Method、Getters / Setters、Index Signatures。
+
+---
+
+## Fields & Readonly
+
+- 實例屬性： 在ES6中， 是無法直接在class中定義屬性，必須定義在 constructor裡面並使用`this.`，而 ES7這可以直接在calss中定義， 而 TypeSript 也跟上腳步，可以直接在class裡面去定義屬性，且public公用的。
+
+- readonly ： 可以使用 readonly 關鍵字來唯讀屬性， 防止進行賦值。
+
+```typescript=
+class Point {
+  x: number; //可以使用實例屬性
+  y: number;
+  readonly name: string = "show point"; //readonly唯讀
+
+  constructor(x = 0, y = 0) {  //預設給0
+    this.x = x;
+    this.y = y;
+  }
+
+  printPoint() {
+    console.log(`x: ${this.x}, y: ${this.y}`);
+  }
+}
+
+let p = new Point(2, 4);
+p.printPoint();  //x: 2, y: 4
+p.name = "hihi"; //若對readonly屬性賦值會報錯 error: Cannot assign to 'name' because it is a read-only property.
+```
+
+- `--strictPropertyInitialization ` (tsconfig.json) : class实例属性的賦值檢查。如下面例子，已宣告name屬性型別，卻沒給予賦值， 就會報錯提醒。
+
+```typescript=
+class GoodGreeter {
+  name: string; //error: Property 'name' has no initializer and is not definitely assigned in the
+  word: string;
+
+  constructor() {
+    this.word = "hello";
+  }
+}
+```
+
+---
+
+## Constructors
+
+constructors： 他跟function的使用很像， 你可以使用型別註記，預設參數。但官網提到可以 overloads, 內心一個問號，javascript class 只有一個 constructor， 所以 TS 可以多個嗎？
+
+//原文： Class constructors are very similar to functions. You can add parameters with type annotations, default values, and overloads
+
+```typescript=
+class Point2 {
+  x: number;
+  y: number;
+
+  // Normal signature with defaults
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+let p2 = new Point2(100,200);
+```
+
+```javascript=
+class Point {
+  // Overloads
+  constructor(x: number, y: string);
+  constructor(s: string);
+  constructor(xs: any, y?: any) {
+    // TBD
+  }
+}
+```
+
+後來實做發現，是不行的唷，不能使用 multiple constructor， 是無法overloads的， 我在想他應該想講的是method可以overloads, 一個函式提供多個型別定義。
+
+```typescript=
+class Point3 {
+  // Overloads
+  constructor(x: number, y: string){ //errro: Multiple constructor implementations are not allowed.
+      this.x = x;
+      this.y = y;
+  };
+  constructor(s: string){
+    this.s = x;
+  }
+}
+
+let p3 = new Point3(1,"5");
+let p4 = new Point3("helllo")
+console.log(p3); //Point3 { x: 1, y: '5' }
+console.log(p4); //Point3 { x: 'helllo', y: undefined }
+```
+
+![](https://i.imgur.com/jJANM8s.png)
+
+---
+
+## Super call
+
+super: 在 JavaScript 我們有時候會忘記在 `this`之前使用 `super` 去調用父層，但在 TypeScript 我們忘了使用 `super`, complier就會提醒我們。
+
+```typescript=
+class Base {
+  k = 4;
+}
+
+class Derived extends Base {
+  constructor() {
+    console.log(this.k);
+// 'super' must be called before accessing 'this' in the constructor of a derived class.
+    super();
+  }
+}
+```
+
+---
+
+## Method
+
+這跟 JavaScript 一樣，可增加 class 方法，並定義參數型別。此外，在 method 裡要使用 class 的屬性，需要使用 `this` 關鍵字。
+
+```typescript=
+let z: number = 0;
+
+class Point4 {
+  x = 10;
+  y = 10;
+  z: string = "hello";
+
+  //method
+  scale(n: number): void {
+    this.x *= n;
+    this.y *= n;
+  }
+
+  //修改class的z屬性，需使用this.z，不然視為修改class外的 z
+  editZ(){
+      z = "world"; //error: Type 'string' is not assignable to type 'number'.
+  }
+}
+```
+
+---
+
+## Getters / Setters
+
+class 也有存取器（accessors）， 就是getter 及 setter，用以改變屬性的讀取和賦值行為，與 es6 class 一樣。 另外在TS4.3引入了新特性， set 及 set 傳入的參數型別可以多種型別。
+
+```typescript=
+class Thing {
+   _size = 0;
+
+  get size(): number {
+    return this._size;
+  }
+
+  set size(value: string | number | boolean) {
+    let num = Number(value);
+
+    // Don't allow NaN, Infinity, etc
+
+    if (!Number.isFinite(num)) {
+      this._size = 0;
+      return;
+    }
+
+    this._size = num;
+  }
+}
+
+let thing = new Thing();
+console.log(thing.size); //0
+thing.size = "seven";
+console.log(thing.size); //0
+thing.size = 2.2;
+console.log(thing.size); //2.2
+
+```
+
+## Index Signatures
+
+在JavaScript中使用`[]`來操作object屬性，那些屬性JavaScript 都會要 `toString` 去讀取， 如下方例子， 使用`obj["name0"]`沒問題，使用`obj[name1]`則會報錯。
+
+```javascript=
+let obj = {
+  name0: "iris",
+  name1: "iris",
+  2: "iris"
+};
+
+console.log(obj["name0"]);  //iris
+console.log(obj[2]); //iris
+console.log(obj[name1]); //error: name1 is not defined
+```
+
+在 TypeScript 中 ， 會強制提醒使用 toString，減少我們的錯誤。
+TypeScript 的Index Signatures 必須是 string 或者 number。
+
+```typescript=
+let obj = {
+  toString() {
+    console.log('toString called');
+    return 'Hello';
+  }
+};
+
+class Foo {
+  constructor(public message: string) {}
+  log() {
+    console.log(this.message);
+  }
+}
+
+let foo: any = {};
+foo['Hello'].log(); // World
+foo[obj] = new Foo('World'); //error: Type '{ toString(): string; }' cannot be used as an index type.
+
+```
+
+想了解更多 Index Signatures 相關可參考 [Day16這篇](https://ithelp.ithome.com.tw/articles/10275784) 。
+
+---
+
+> 感謝閱讀！明天見～
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/classes.html
+https://willh.gitbook.io/typescript-tutorial/advanced/class#typescript-zhong-lei-bie-de-yong-fa

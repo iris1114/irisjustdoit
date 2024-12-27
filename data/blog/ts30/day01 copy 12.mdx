@@ -1,0 +1,120 @@
+---
+title: 'Day12: 【TypeScript 學起來】只有 TS 才有的型別: Literal Types(字面值型別) / Tuple (元組)'
+date: 2021-10-22
+tags: ['ts30', 'tech']
+draft: false
+summary: 今天來介紹Literal Types(字面值型別) / Tuple (元組)。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day12: 【TypeScript 學起來】只有 TS 才有的型別: Literal Types(字面值型別) / Tuple (元組)
+
+> 工程師A： 覺得當工程師好累 想換一行怎麼辦
+> 工程師B： 按一下 enter 啊
+> 工程師A：......
+>
+> 很常工程師之間都聊不下去了 更何況是pm 你說是不是....
+> 今天來介紹Literal Types(字面值型別) / Tuple (元組)。
+
+---
+
+## Literal Types 字面值型別
+
+### string literal types
+
+就是值的表現方式，某些特殊的"值"可以當作"型別"來使用，用來約束取值只能是某幾個字串中的一個。 如下方讓 x 變數的字面值為“hello”。
+
+```typescript=
+let x: "hello" = "hello";
+x = "hello"; //ok
+x = "howdy";  //Type '"howdy"' is not assignable to type '"hello"'
+```
+
+![](https://i.imgur.com/cA7a9Mx.png)
+
+但很少情況會使用到一個變數只有一個值，我們可以將想要的值結合起來， 如 alignment 給予3個字面值，其參數要符合其中一個。如果不符合這3個值的其中一個或寫錯字， 都會報錯。
+
+```typescript=
+function printText(s: string, alignment: "left" | "right" | "center") {
+    console.log(`${s} placed at the ${alignment}`)
+}
+printText("Hello, world", "left");
+printText("G'day, mate", "centre");
+//error: Argument of type '"centre"' is not assignable to parameter of type '"left" | "right" | "center"'.
+```
+
+![](https://i.imgur.com/GKx1O64.png)
+
+---
+
+### numeric literal types
+
+除了文字上， 數字的操作也一樣：
+執行compare函式的回傳值只能 -1、0 和 1。
+
+```typescript=
+function compare(a: string, b: string): -1 | 0 | 1 {
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+```
+
+---
+
+### non-literal types
+
+非字面值型別也可以結合操作：
+
+```typescript=
+interface Options {
+  width: number;
+}
+function configure(x: Options | "auto") {
+   console.log(x);
+}
+configure({ width: 100 });
+configure("auto");
+configure("automatic"); // 不符Options 及 “auto”
+//error： Argument of type '"automatic"' is not assignable to parameter of type 'Options | "auto"'.
+```
+
+![](https://i.imgur.com/IRxwOP4.png)
+
+---
+
+## Tuple 元組
+
+Tuple 就是合併了不同型別的物件。
+定義一對值分別為 string 和 number 的元組：
+
+```javascript=
+const iris: [string, number] = ['iris', 18];
+```
+
+可以針對型別有的屬性進行使用、賦值。但當直接對元組型別的變數進行初始化或者賦值，需提供所有項目。如果要新增不同型別的項目也是無法的：
+
+```typescript=
+let tom: [string, number];
+tom = ['tom', 18]; //如果只有宣告tom沒賦值，會是undefined，tsconfig strictNullChecks 打開的話會報錯提醒
+tom[0] = 'Tom'; //ok
+tom[1] = 25; //ok
+tom[0].slice(1); //ok
+tom[1].toFixed(2); //ok
+tom.push('male'); //ok
+
+tom = ['tom chen']; //error:Property '1' is missing in type '[string]' but required in type '[string, number]'.
+tom.push(true); //error: Argument of type 'true' is not assignable to parameter of type 'string | number'.
+```
+
+![](https://i.imgur.com/ZorCrqV.png)
+
+> 邊學習邊紀錄的測試例子，不嫌棄可[參考這裡](https://github.com/iris1114/typescript-learning/blob/main/day12/src/index.ts)。
+>
+> 感謝閱讀，明天見～～
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+https://willh.gitbook.io/typescript-tutorial/advanced/tuple

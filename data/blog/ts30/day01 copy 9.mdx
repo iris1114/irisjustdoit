@@ -1,0 +1,213 @@
+---
+title: 'Day09: 【TypeScript 學起來】物件型別 Object Types : Arrays / Function'
+date: 2021-10-19
+tags: ['ts30', 'tech']
+draft: false
+summary: 繼上篇了解了基本 object 在 TypScript 的使用， 今天來了解 array 及 function
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day09: 【TypeScript 學起來】物件型別 Object Types : Arrays / Function
+
+> Q: 如何反駁「工程師離開電腦之後就是個廢物」的這個說法？
+> A: 不不不，很多工程師在電腦前面也是廢物
+>
+> 哈哈 我在任何時候都是廢物 XDD
+> 繼上篇了解了基本 object 在 TypScript 的使用， 今天來了解 array 及 function 。
+
+---
+
+## Arrays
+
+在 TypeScript 中， 有四種方式可以來定義陣列型別：
+
+### 1. 一般方括號寫法
+
+讓 TypeScript 自動進行型別推斷（Type Inference）。如下面例子，TS 推斷 list1 為 `number[]` 型別。
+
+```typescript=
+const list1 = [1, 2, 3];
+```
+
+![](https://i.imgur.com/7oj8o5E.png)
+
+---
+
+### 2.「型別 + 方括號」表示法
+
+✅ `number[]`表示此陣列型別只允許數值:
+
+```typescript=
+const list2: number[] = [1, 2, 3];
+```
+
+❌ 如果不是數值則會報錯，如：
+
+```typescript=
+list1.push('8');
+// error: Argument of type 'string' is not assignable to parameter of type 'number'.
+```
+
+---
+
+### 3. 陣列泛型
+
+✅ 我們可以使用陣列[泛型](https://www.typescriptlang.org/docs/handbook/2/generics.html#hello-world-of-generics)（Array Generic） Array<elemType> 來表示陣列：
+
+```typescript=
+const list3: Array<number> = [1, 2, 3];
+```
+
+---
+
+### 4. 用 interface (介面)定義陣列
+
+✅ 也可以使用 interface 來描述陣列的形狀，`NumberArray` 表示：只要索引的型別是數字時，那麼值的型別必須是數字。
+
+```typescript=
+interface NumberArray {
+    [index: number]: number;
+}
+const list4: NumberArray = [1, 1, 2, 3, 5];
+```
+
+❗ 雖然 interface 也可以用來描述陣列，但是我們一般不會這麼做，因為這種方式比前面的方式複雜多了。不過有一種情況例外，那就是它常用來表示類別陣列。
+
+---
+
+## Function
+
+### 1. Parameter Type Annotations 參數型別註釋
+
+✅ 在參數後面添加`:資料型別`來定義這個 function 接受什麼型別的參數。
+
+```typescript=
+function greet(name: string) {
+  console.log("Hello, " + name.toUpperCase() + "!!");
+}
+```
+
+❌ 如果參數不是 string , 則會報錯：
+
+```typescript=
+greet(42);
+//error: Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+---
+
+### 2. Return Type Annotations 返回值型別註釋
+
+✅ 可以給 function 設定返回值要返回什麼樣的資料型別。
+
+```typescript=
+function getFavoriteNumber(): number {
+  return 26;
+}
+```
+
+❌ 如果返回一個字串，則會報錯：
+
+```typescript=
+function getFavoriteNumber2(): number {
+    return "26";
+}
+//error : Type 'string' is not assignable to type 'number'.
+```
+
+---
+
+### 3. 定義 Function 的方法
+
+### Function Declaration 函式宣告
+
+```typescript=
+//javascript
+function sum(x, y) {
+    return x + y;
+}
+
+//typescript
+function sum(x: number, y: number): number {
+  return x + y;
+}
+console.log(sum(1,2)); //3
+```
+
+---
+
+### Function Expression 函式表示式
+
+```typescript=
+//javascript
+let sum2 = function (x, y) {
+    return x + y;
+};
+
+//typescript
+let sum2 = function (x: number, y: number): number {
+  return x + y;
+};
+console.log(sum2(1,2)); //3
+```
+
+---
+
+### Arrow Function 箭頭函式
+
+```typescript=
+//javascript
+let sum3 = (x, y) => {
+    return x + y;
+}
+
+//typescript
+let sum3 = (x: number, y: number): number =>  x + y;
+console.log(sum3(1,2)); //3
+```
+
+---
+
+### Anonymous Functions 匿名函式
+
+✅ 在 TypeScript 中使用匿名函數時， 他會自動去推斷參數型別。我們來看看例子：
+
+```typescript=
+const names = ["Alice", "Bob", "Eve"];
+names.forEach( (s) => {
+    console.log(s.toUpperCase());
+});
+```
+
+TypeScript 會自動names這個變數是字串陣列， 帶入的參數為字串。
+
+![](https://i.imgur.com/Hde0uLx.png)
+![](https://i.imgur.com/c9wa8zc.png)
+
+❌ 我們來故意拼錯字串才能用的屬性`toUpperCase`拼成 `toUppercase`（不過日常真的會不小心拼錯）：
+
+```typescript=
+names.forEach( (s) => {
+    console.log(s.toUppercase());
+});
+
+// error: Property 'toUppercase' does not exist on type 'string'. Did you mean 'toUpperCase'?
+```
+
+他會告訴你`'toUppercase'`不存在字串型別的屬性， 是不是要改為`'toUpperCase'`，覺得這個真心很方便～
+
+後面也會詳細筆記一些有關 function 函式的應用， 包括 interface 定義函式形狀、可選參數、重載等。
+
+---
+
+> 邊學習邊紀錄的範例可[參考這裡](https://github.com/iris1114/typescript-learning/blob/main/day09/src/index.ts)。
+>
+> 今天介紹完 arrays 和 function了，明天開始來筆記只有 TypeScript 才有的型別了！
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/basics/type-of-array#can-kao
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#anonymous-functions

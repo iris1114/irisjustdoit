@@ -1,0 +1,244 @@
+---
+title: '鐵人賽Day01: 為什麼我想要學 TypeScript'
+date: 2021-10-11
+tags: ['ts30', 'tech']
+draft: false
+summary: 這是一篇欠了很久的開場，大概轉行不到1年的時候，就一直聽到 TypeScript 的名字，想說到底是啥
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day29 :【TypeScript 學起來】React + TypeScript 實作簡單 Todo App Part2
+
+> 今天繼續 todo app part2， 會紀錄實作上遇到的問題。
+>
+> 若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+## TodoItem Component
+
+新增 `src/components/todos/TodoItem.tsx`
+
+```typescript=
+//@file: src/components/todos/TodoItem.tsx
+import styled from "styled-components";
+
+//定義Props介面，todo 需符合Todo的形狀
+interface Props {
+    todo: Todo; //已在types.d.ts 全域定義
+    index: number;
+    onToggleTodo: ToggleTodo;
+    onDeleteTodo: DeleteTodo;
+}
+
+//定義completed的style, 定義completed回傳值會是boolean型別，如果是true則劃線， false的話none
+const StyledTodo = styled.span<{ completed: boolean }>`
+    text-decoration: ${(props) => (props.completed ? "line-through" : "none")};
+`;
+
+//React.FC<Props> 定義這個 FunctionComponent為Props泛型
+const TodoItem: React.FC<Props> = ({
+    index,
+    todo,
+    onToggleTodo,
+    onDeleteTodo,
+}) => {
+    return (
+        <div className="form-check border border-bottom-secondary rounded py-3 m-0 d-flex justify-content-between align-items-center">
+            <div>
+                <input
+                    className=" ms-1 me-3 form-check-input"
+                    type="checkbox"
+                    checked={todo.complete}
+                    onClick={() => {
+                        onToggleTodo && onToggleTodo(index);
+                    }}
+                />
+                <StyledTodo className="todo" completed={todo.complete}>
+                    {todo.text}
+                </StyledTodo>
+            </div>
+
+            <button
+                className="btn btn-outline-danger me-3"
+                onClick={() => onDeleteTodo && onDeleteTodo(index)}
+            >
+                X
+            </button>
+        </div>
+    );
+};
+
+export default TodoItem;
+
+
+```
+
+我遇到的一些事：
+
+- React.FC<>的在TypeScript使用的一個泛型，FC就是FunctionComponent的縮寫，是函式組件。
+
+- `React.FC<Props> `React.FC會依照Props定義好的屬性型別帶入參數，有點像平時我們寫function帶入參數的概念一樣。
+
+- 覺得TS 真的蠻嚴謹， 像 `StyledTodo` ， 原本是想直接帶入直接使用 `props.completed`， 但會報錯， 他需要去定義`styled.span<{ completed: boolean }>` 傳入值是boolean型別。
+
+- 然後是說我太久沒用bootstrap, v5 原本的 `ml` (margin-right), 改為 `me`(margin-end)，right 改為`e` (end)，left 則改為 `s` (start)。
+
+---
+
+## AddTodoInput Component
+
+新增 `src/components/todos/AddTodoInput.tsx`
+
+```typescript=
+//@file: src/components/todos/AddTodoInput.tsx
+
+import React, { FormEvent, useState } from "react";
+
+interface Props {
+    onCreate: IAddTodo;
+}
+
+const AddTodoInput: React.FC<Props> = ({ onCreate }) => {
+    const [text, setText] = useState("");
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        onCreate && onCreate(text);
+        setText("");
+    };
+
+    return (
+        <form className="input-group mb-5" onSubmit={handleSubmit}>
+            <input
+                className="form-control border-primary"
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+            />
+            <button
+                className="btn btn-primary"
+                type="submit"
+                onClick={handleSubmit}
+                disabled={!text}
+            >
+                Add Todo
+            </button>
+        </form>
+    );
+};
+
+export default AddTodoInput;
+```
+
+我遇到的一些事：
+
+- `onCreate` 也需要標記型別， callback function 也需要定義型別。
+- 在`handleSubmit` 需要本來以為直接用`e`就可以了， 結果不行， 需定義 event 類型，可參考 [React’s Event System](https://reactjs.org/docs/events.html#supported-events)，我這邊使用的 `onSubmit`屬於 [FormEvent](https://reactjs.org/docs/events.html#form-events)，所以針對`e`去定義。這個event分類比我想像中的多， 突然覺得 JS 好幸福寫`e`就好惹。
+
+---
+
+## Home Page
+
+新增 `src/pages/Home.tsx`
+
+```typescript=
+//@file: src/pages/Home.tsx
+import { useState } from "react";
+import AddTodoInput from "../components/todos/AddTodoInput";
+import TodoItem from "../components/todos/TodoItem";
+import { v4 as uuid } from "uuid";
+
+const initialTodos: Todo[] = [
+    {
+        text: "walk the dog",
+        complete: true,
+    },
+    {
+        text: "learn TypeScript",
+        complete: false,
+    },
+];
+
+const Home = () => {
+    const [todos, setTodos] = useState(initialTodos);
+
+    const addTodo: AddTodo = (text: string) => {
+        const newTodo = { text, complete: false };
+        setTodos([...todos, newTodo]);
+    };
+
+    const toggleTodo: ToggleTodo = (index: number) => {
+        const newTodos: Todo[] = [...todos];
+        newTodos[index].complete = !newTodos[index].complete;
+        setTodos(newTodos);
+    };
+
+    const deleteTodo: DeleteTodo = (index: number) => {
+        setTodos([...todos.slice(0, index), ...todos.slice(index + 1)]);
+    };
+
+    return (
+        <main className="pt-5 mx-auto">
+            <div className="container">
+                <AddTodoInput onAddTodo={addTodo} />
+                {todos.map((todo, index) => {
+                    return (
+                        <TodoItem
+                            todo={todo}
+                            key={uuid()}
+                            index={index}
+                            onToggleTodo={toggleTodo}
+                            onDeleteTodo={deleteTodo}
+                        />
+                    );
+                })}
+            </div>
+        </main>
+    );
+};
+
+export default Home;
+
+```
+
+我遇到的一些事：
+
+- initialTodos 也需要定義型別，因為他是個 array ，我們可以給他 `Todo[]`型別。
+- `AddTodo` `ToggleTodo` `DeleteTodo` 可在 types.d.ts 定義好，比起在 function 裡面定義更乾淨。
+
+---
+
+## App.tsx
+
+這邊也記得改一下：
+
+```typescript=
+import Home from "./pages/Home";
+
+const App = () => {
+    return <Home />;
+};
+
+export default App;
+
+```
+
+---
+
+## 完成了～
+
+![](https://i.imgur.com/UNgvDlO.gif)
+
+這就完成簡單的 Todo App 了， 也同步在 [github](https://github.com/iris1114/react-typescript-todo-app) 可參考。
+
+---
+
+> day29 done. 明天最後一天了～～有點感動!!!
+
+---
+
+## 參考資料
+
+https://typeofnan.dev/your-first-react-typescript-project-todo-app/

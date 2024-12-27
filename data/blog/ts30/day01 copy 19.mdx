@@ -1,0 +1,211 @@
+---
+title: '鐵人賽Day01: 為什麼我想要學 TypeScript'
+date: 2021-10-11
+tags: ['ts30', 'tech']
+draft: false
+summary: 這是一篇欠了很久的開場，大概轉行不到1年的時候，就一直聽到 TypeScript 的名字，想說到底是啥
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day19 :【TypeScript 學起來】More on Functions
+
+> 我們在前面 [Day09](https://ithelp.ithome.com.tw/articles/10270427) ， 有簡單討論到 function，這篇就會來看一些更深入 function 的應用。
+
+---
+
+## 使用 function 關鍵字
+
+最簡單定義 function 的用法：
+
+```javascript=
+function greeter(fn: (a: string) => void) {
+  fn("Hello, World");
+}
+
+function printToConsole(s: string) {
+  console.log(s);
+}
+
+greeter(printToConsole); //Hello, World
+```
+
+`(a: string) => void ` 表示這個function帶入的一個命名為 a 的參數，這個參數的型別為字串， 且此 funtion 沒有 return 值。
+
+特別注意一定要有參數命名，如`(a: string)`。如果這樣沒命名， 這樣寫 ` (string) => void` 就會表示這個參數命名為string， 型別是 `any`。
+
+此外， type 及 interface 也能定義 function ， 可參考 [Day15 這篇](https://ithelp.ithome.com.tw/articles/10275208)。
+
+---
+
+## Call Signatures，給 function 新增屬性
+
+其實這個我一開始真的看不懂，感謝google大神讓我找到實現官網例子的方法，大概了解了，下面也來實作一下。
+
+在 JavaScript 中， function 是可以增加屬性的（其實我不知道欸，好像沒有試過對 function 增加屬性）。於是想來證明是否真的可以，寫了小例子，還真的可以增加屬性：
+
+```javascript=
+const jsFunc = () => {
+    return "this's a function";
+}
+
+jsFunc.prop = "this's a prop";
+jsFunc.desc = "this's a desc";
+console.log(jsFunc);  //[Function: func] { prop: "this's a prop", desc: "this's a desc" }
+```
+
+但在 TypeScript 中 type expression 是不允許對 function 新增屬性的，於是我們可以在 object type 寫一個 call signatures， 如下 `DescribableFunction`。特別注意跟一般 function 不同的是返回型別是使用` :`， 不是使用 `=>`。
+
+```typescript=
+//新增 call signatures
+type DescribableFunction = {
+  description: string;
+  (someArg: number): boolean;  //這邊特別注意我們使用：非 =>
+};
+
+function doSomething(fn: DescribableFunction) {
+  console.log(fn.description + " returned " + fn(6));
+}
+
+//回傳boolean 如果大於5回傳true
+const func = (someArg: number): boolean => {
+  return someArg > 5;
+};
+
+//新增屬性
+func.description = "isNumber > 5";
+
+doSomething(func); //isNumber > 5 returned true
+
+```
+
+---
+
+## Construct Signatures
+
+一般我們使用 new 來建立新 object， 就稱為 constructors 。
+
+```typescript=
+type SomeConstructor = {
+  new (s: string): SomeObject;
+};
+function fn(ctor: SomeConstructor) {
+  return new ctor("hello");
+}
+```
+
+---
+
+## Optional Parameters 可選參數
+
+雖然在 JavaScript 中沒有被帶入的函式參數會是 undefined 且可以正常運作，但在 TypeScript 中，函式的參數預設都是必填的，沒填的話 compiler 會直接噴錯。
+
+跟之前在介紹 object 型別可選屬性一樣，參數也可以選填，在參數後面使用`?`。
+
+```typescript=
+// firstName 是必填，lastName 則可以選填
+const getName = (firstName: string, lastName?: string) => {
+    return  lastName ? `${firstName} ${lastName}` : firstName;
+}
+```
+
+⚠️ 特別注意的是optional parameter 一定只能放在 required parameter 的後面。
+
+⚠️ 官網也有特別提醒在 callback 的時候也盡量不要使用 optional parameter， 可能會發生[這種錯誤](https://www.typescriptlang.org/docs/handbook/2/functions.html#optional-parameters-in-callbacks)。
+
+---
+
+## default-initialized parameters 使用參數預設值
+
+```typescript=
+const getName = (firstName: string, lastName = "Chen") => {
+    return `${firstName} ${lastName}`;
+}
+
+console.log(getName("Tom")); //Tom Chen
+```
+
+如果要使用預設值，在呼叫該函式的時候要使用` undefined`。
+
+```typescript=
+
+const getName = (firstName = "Tom", lastName: string) => {
+    return `${firstName} ${lastName}`;
+}
+
+console.log(getName(undefined, "Chen")); //Tom Chen
+
+```
+
+---
+
+## Rest Parameters
+
+想新增無限組參數，可使用剩餘參數關鍵字 `...`
+
+```typescript=
+function multiply(n: number, ...m: number[]) {
+  return m.map((x) => n * x);
+}
+
+const a = multiply(10, 1, 2, 3, 4);
+
+console.log(a); //[10, 20, 30, 40]
+```
+
+```typescript=
+const getName = (firstName: string, ...rest: string[]) => {
+    return `${firstName} ${rest.join(' ')}`;
+}
+const names = getName('Tom', 'Jerry', 'Chen');
+console.log(names);
+```
+
+## Rest Arguments
+
+雖然可以用 push 的方式新增剩餘參數是沒問題：
+
+```typescript=
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+arr1.push(...arr2);
+
+console.log(arr1); // [1, 2, 3, 4, 5, 6]
+```
+
+但在 TypeScript , 但在一些使用上會有問題：
+`args` 會被 inferred 型別為 `number[]`， 不是特定兩個數字。
+
+```typescript=
+// Inferred type is number[] -- "an array with zero or more numbers",
+// not specifically two numbers
+const args = [8, 5];
+// error
+const angle = Math.atan2(...args);
+```
+
+Math.atan2 是什麼 [可參考這裡](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2)。
+
+我們可以把陣列直接當成 Tuple 使用，可以在定義陣列是加上 `as const`，如此它就是會是一個值固定的 readonly array，這樣就沒問題了。如果沒加上 `as const` 的話，則會是` number[]`：
+
+```typescript=
+// Inferred as 2-length tuple
+const args = [8, 5] as const;
+// ok
+const angle = Math.atan2(...args);
+```
+
+---
+
+> 下一篇來筆記 Function Overloads 函式超載 ，第一次知道有這種功能， 覺得很cool。
+
+---
+
+## 參考
+
+https://zhuanlan.zhihu.com/p/266823134
+https://stackoverflow.com/questions/66874130/how-to-properly-use-functions-construct-signatures-in-typescript
+https://basarat.gitbook.io/typescript/type-system/type-inference
+https://pjchender.dev/typescript/ts-functions/#%E9%81%B8%E5%A1%AB%E6%80%A7%E7%9A%84%E5%8F%83%E6%95%B8%E8%88%87%E5%8F%83%E6%95%B8%E9%A0%90%E8%A8%AD%E5%80%BC
+https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2
+https://pjchender.dev/typescript/ts-basic-types/
