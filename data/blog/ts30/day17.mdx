@@ -1,0 +1,146 @@
+---
+title: ' Day17: 【TypeScript 學起來】什麼是 Narrowing？'
+date: 2021-10-27
+tags: ['typscript30', 'tech']
+draft: false
+summary: Narrowing 指的是將某一個可能是多種型別的變數，縮小成具體型別的過程，通常用在聯合型別。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day17: 【TypeScript 學起來】什麼是 Narrowing？
+
+> 其實看官網看這篇的時候很想pass，有點看不下去XD，但還是做了筆記。若有錯誤，歡迎留言指教，感恩的心。
+
+## Narrowing
+
+Narrowing 指的是將某一個可能是多種型別的變數，縮小成具體型別的過程，通常用在聯合型別。他的好處就是，有點像檢查你什麼型別的時候就做什麼事，分工明確，常出現在 `if... else` 裡使用。
+
+有點抽象，來用code理解吧：
+
+❌ 依照下面 padLeft 函式，他想要做的功能是當 padding 參數是數字的時候，就會依據該數字在input前加上多少個空格，若當padding是字串時，就在input前加入該字串。 但以下例子， 當 padding 參數帶入數字時，會報錯。
+
+```javascript=
+function padLeft(padding: number | string, input: string) {
+  return new Array(padding + 1).join(" ") + input;
+}
+
+//error: Operator '+' cannot be applied to types 'string | number' and 'number'.
+```
+
+✅ 所以我們應該要先檢查 padding 型別是不是 number，再依不同型別去各自做處理，下面這個例子是以 `typeof` 去 narrow 不同型別的執行範圍，這個過程就是 narrowing。 其實我前面文章也有用過相關的方法，才知道原來在 TypeScript 有 narrowing 概念之說。
+
+```javascript=
+function padLeft(padding: number | string, input: string) {
+  if (typeof padding === "number") { //數字
+    return new Array(padding + 1).join(" ") + input;
+  }
+  return padding + input; //其他就是字串
+}
+```
+
+---
+
+## 使用`typeof` type guards
+
+typeof 的操作可以讓我們取得值的型別類型，如`string`,`number`,`boolean`,`symbol`,`undefined`,`object`,`function`。 但 `null` 除外。
+
+如下例子，`typeof strs === "object"` 這就是一種 type guards （型別保護）。雖然 null 無法使用 typeof 來取得型別，但 null 也是object, TypeScript 會提醒 strs 有可能是 null。 （tsconfig 記得打開嚴謹模式）
+
+```javascript=
+function printAll(strs: string | string[] | null) {
+    if (typeof strs === "object") {
+      for (const s of strs) {
+       //Object is possibly 'null'.
+      }
+    } else if (typeof strs === "string") {
+      console.log(strs);
+    } else {
+      console.log(strs);
+    }
+}
+```
+
+---
+
+## Equality narrowing
+
+可以使用 `switch` 或是 `===`， `!==`， `==`， and `!=` 來縮小型別。
+
+```typescript=
+function printAll(strs: string | string[] | null) {
+  if (strs !== null) {
+    if (typeof strs === "object") {
+      for (const s of strs) {
+        console.log(s);
+      }
+    } else if (typeof strs === "string") {
+      console.log(strs);
+    }
+  }
+}
+```
+
+---
+
+## 使用`"value" in x`
+
+使用`"value" in x`的概念， value 為 string literal，x 為聯合型別（animal）。
+
+```javascript=
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+
+function move(animal: Fish | Bird) {
+  if ("swim" in animal) {  //animal 物件裡有屬性 "swim"，則一定是 Fish 型別
+    return animal.swim();
+  }
+
+  return animal.fly();
+}
+```
+
+---
+
+## 使用 `instanceof`
+
+instanceof 用來檢查某個值是否為某個 constructor。如下面例子， 如果 `x`參數為 Date constructor, 就可以進行`toUTCString()`的方法。其他就是字串，就進行`toUpperCase()`方法。
+
+```javascript=
+function logValue(x: Date | string) {
+  if (x instanceof Date) {
+    console.log(x.toUTCString());
+    //(parameter) x: Date
+  } else {
+    console.log(x.toUpperCase());
+    //(parameter) x: string
+  }
+}
+```
+
+---
+
+## 使用 Assignments
+
+我們进行赋值時給予限制也進行了 narrowing。如下方例子，在賦予 x 值時， x 的型別就會是 `number` 或者 `string`。 我們賦值數字或字串都是ok的， 但賦值boolean就會報錯提醒。
+
+```javascript=
+let x = Math.random() < 0.5 ? 10 : "hello world!";
+console.log(Math.random());
+console.log(x);
+x = 1;
+console.log(x); //1
+x = true;  //error:Type 'boolean' is not assignable to type 'string | number'.
+```
+
+![](https://i.imgur.com/63O02bk.png)
+
+---
+
+> 下篇繼續講 narrowing 唷，覺得難，我覺得啦QQ，明天見！
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/narrowing.html

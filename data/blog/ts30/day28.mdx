@@ -1,0 +1,177 @@
+---
+title: 'Day28 :【TypeScript 學起來】React + TypeScript 實作簡單的 Todo App Part1'
+date: 2021-11-08
+tags: ['typscript30', 'tech']
+draft: false
+summary: 前面筆記了那麼多，終於來實作看看了～先來做個簡單的 to do app，也會紀錄實作上遇到的問題。
+authors: ['chick_playground']
+---
+
+# Day28 :【TypeScript 學起來】React + TypeScript 實作簡單的 Todo App Part1
+
+> 前面筆記了那麼多，終於來實作看看了～先來做個簡單的 to do app，也會紀錄實作上遇到的問題。
+>
+> 若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+## 環境安裝
+
+使用 `create-react-app` 來建置環境：
+
+```json=
+npx create-react-app my-app --template typescript
+
+# or
+
+yarn create react-app my-app --template typescript
+```
+
+---
+
+## 啟動 App
+
+```
+cd my-app
+```
+
+```
+npm start
+
+# or
+
+yarn start
+```
+
+打開 http://localhost:3000/ 看到 react logo, 就啟動成功。
+
+---
+
+## 加入 TypeScript
+
+安裝 TypeScript 添加到現有的 Create React App 項目
+
+```
+npm install --save typescript @types/node @types/react @types/react-dom @types/jest
+
+# or
+
+yarn add typescript @types/node @types/react @types/react-dom @types/jest
+```
+
+## 刪除沒用的file
+
+```
+cd src
+
+rm App.css App.test.tsx index.css logo.svg serviceWorker.ts setupTests.ts
+```
+
+## Edit code
+
+`src/index.tsx` 中將一些沒用的進行移除整理。
+
+```typescript=
+//@file: src/index.tsx
+
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+
+ReactDOM.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>,
+    document.getElementById("root")
+);
+```
+
+`src/App.tsx`
+
+```typescript=
+const App = () => {
+    return <>hello world</>;
+};
+
+export default App;
+
+```
+
+整理後，看看有沒有印出 `hello world`。
+
+---
+
+## 新增會使用到的套件
+
+就按習慣安裝會用到的套件，記得也要安裝 TypeScript 支援版本，沒安裝的話，import 時就會報錯，我也是被報錯才知道原來還要安裝 ts 版。
+
+```
+yarn add --dev styled-components @types/styled-components bootstrap react-bootstrap uuid @types/uuid
+```
+
+---
+
+## Type Declaration File 宣告檔案 - `*.d.ts`
+
+一般來說，ts 會解析專案中所有的 _.ts 檔案，當然也包含以 .d.ts 結尾的檔案。所以當我們將 type.d.ts 放到專案中時，其他所有 _.ts 檔案就都可以獲得 type 的型別定義了，可以全域使用。
+
+新增 `src/types.d.ts`, 並將定義的 interface 寫進去，供全域使用。
+
+```typescript=
+//@file: src/types.d.ts
+
+//定義Todo介面， 會有text, 及complete是否完成
+interface Todo {
+    text: string;
+    complete: boolean;
+}
+
+//定義IAddTodo ， 回傳參數text為string型別， 並無回傳值void
+type AddTodo = (text: string) => void;
+
+//定義ToggleTodo， 回傳參數index為number型別， 並無回傳值void (點擊todo改變complete狀態用)
+type ToggleTodo = (index: number) => void;
+
+//定義DeleteTodo ， 回傳參數index為number型別， 並無回傳值void (刪除todo用)
+type DeleteTodo = (index: number) => void;
+
+```
+
+當然上面定義的我也是邊寫有需要再定義，也可以使用`interface`去定義，特別注意 interface 及 type 定義 function 的寫法不一樣唷：
+
+```typescript=
+//interface
+interface IAddTodo {
+    (text: string): void;
+}
+
+//type
+type IAddTodo = (index: number) => void;
+```
+
+我遇到的一些事：
+
+過程中猶豫要用 `interface` 或是 `type` ，問了幾個大大的公司，有用 `interface` 也有用 `type` 的， 使用 `type` 的多一點，原因似乎都是公司這樣用就這樣用了，或是習慣。
+
+原本想用 type 了， 因為覺得 type 可以描述 primitive type、tuple、union type 等(可看[之前寫的](https://ithelp.ithome.com.tw/articles/10275208)），interface 無法，為了後續維護及擴充，比較方便。
+
+但看的 [todo app參考文章](https://typeofnan.dev/your-first-react-typescript-project-todo-app/) 定義object時使用 `interface` ，定義 function 使用`type`。 然後也看了[這篇文](https://blog.logrocket.com/types-vs-interfaces-in-typescript/) :
+
+- Interfaces are better when you need to define a new object or method of an object.
+- Types are better when you need to create functions.
+
+我後來也這樣使用了。
+
+---
+
+> 我一開始是參考[這篇](https://typeofnan.dev/your-first-react-typescript-project-todo-app/)，他會一個步驟一個步驟教，對新手來說蠻友善的，提供有需要的朋友。後來我自己新增減少修改一些，我這邊筆記是已完成版及實作過程中遇到的問題，真心佩服一步一步教學的大大們。
+>
+> 明天來繼續 part 2~
+
+---
+
+## 參考資料
+
+https://create-react-app.dev/docs/adding-typescript/
+https://typeofnan.dev/your-first-react-typescript-project-todo-app/
+https://willh.gitbook.io/typescript-tutorial/basics/declaration-files

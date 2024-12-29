@@ -1,0 +1,67 @@
+---
+title: 'Day06:【TypeScript 學起來】資料型別那些事 : 總覽'
+date: 2021-10-16
+tags: ['typscript30', 'tech']
+draft: false
+summary: 上一篇我們了解了指定型別的三種方法，那有哪些型別可以使用呢， 今天來整理 TypeScript 有可能會使用到的資料型別。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day06:【TypeScript 學起來】資料型別那些事 : 總覽
+
+> Q: 為什麼工程師都喜歡用 dark mode？
+> A: 因為太亮會吸引很多 bug。
+> 原來如此XDD
+
+---
+
+上一篇我們了解了指定型別的三種方法，那有哪些型別可以使用呢， 今天來整理 TypeScript 有可能會使用到的資料型別。
+
+## 資料型別小小分類
+
+我大致把他分為3大類：
+
+1. 原始資料型別（Primitive types） : string (字串)、number (數值)、boolean (布林值)、null、undefined
+
+2. 物件型別（Object types）: object(物件) 、 arrays(陣列) 、function(函式)
+
+3. TypeScript 才有的型別 : any、unknown、void、 never、 union types(聯合型別) 、intersection types（交集型別）、 literal types(字面值型別)、 tuple(元組)、 enums(列舉)
+
+---
+
+## TypeScript 資料型別整理表
+
+花了不少時間參考網站，大致整理了所有類型的簡單使用方法，但還沒實際套用在專案過，就先邊筆記邊學習（有誤歡迎告知～），接下來幾篇也會再詳細介紹各個型別。
+
+| Type               | 型別分類  | 筆記                                                                                                | Example                              |
+| ------------------ | --------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| string             | primitive | 定義字串型別。                                                                                      | ![](https://i.imgur.com/lmEXedP.png) |
+| number             | primitive | 定義數值型別。                                                                                      | ![](https://i.imgur.com/ZxfDF8n.png) |
+| boolean            | primitive | 定義布林值型別。                                                                                    | ![](https://i.imgur.com/0fxjYBu.png) |
+| null               | primitive | 定義空值型別， 亦可賦值給所有型別(嚴謹模式則無法)。                                                 | ![](https://i.imgur.com/wFh7yev.png) |
+| undefined          | primitive | 定義 undefined 型別，亦可賦值給所有型別(嚴謹模式則無法)。                                           | ![](https://i.imgur.com/FwfCLfq.png) |
+| object             | object    | 定義物件型別。                                                                                      | ![](https://i.imgur.com/tP9SQNa.png) |
+| arrays             | object    | 可使用「型別 + 方括號」或陣列泛型來表示陣列。                                                       | ![](https://i.imgur.com/dUGB9xD.png) |
+| function           | object    | 一個函式有輸入和輸出，可以針對參數(輸入)及返回值(輸出)進行型別規範。                                | ![](https://i.imgur.com/20ISjGS.png) |
+| any                | TS        | 表示允許賦值為任意型別。                                                                            | ![](https://i.imgur.com/ZS1S4Jd.png) |
+| unknown            | TS        | unknown 和 any 一樣可以接受任何型別賦值，但 any 可以賦值給任何型別，unknown 只能賦值給 any 和自己。 | ![](https://i.imgur.com/VoCbPoI.png) |
+| void               | TS        | 表示沒有任何返回值的函式。                                                                          | ![](https://i.imgur.com/l2Owpvm.png) |
+| never              | TS        | 來表示不應該存在的狀態的型別，一般用於錯誤處理函式。                                                | ![](https://i.imgur.com/xtjYqyc.png) |
+| union types        | TS        | 聯合型別(union type) 使用｜表示其定義的值可以為多種型別。                                           | ![](https://i.imgur.com/UcKA7Rr.png) |
+| intersection types | TS        | 交集型別(intersection type) 使用 & 表示其定義的值都必須符合多種型別。                               | ![](https://i.imgur.com/eOydNVC.png) |
+| literal types      | TS        | 某些特殊的"值"可以當作"型別"來使用。                                                                | ![](https://i.imgur.com/lAXDKMe.png) |
+| tuple              | TS        | tuple 就是合併了不同型別的物件。                                                                    | ![](https://i.imgur.com/pFJUy7c.png) |
+| enum               | TS        | 列舉（enum）型別可以用來管理多個同系列的常數，作為狀態判斷使用。                                    | ![](https://i.imgur.com/Ak6eTxS.png) |
+
+我們接下來就來展開 TypeScript 資料型別探險了，來一起戴好口罩😷，系好安全帶，準備出發～GO!
+例子參考[這裡](https://github.com/iris1114/typescript-learning/blob/main/day06/src/index.ts)。
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/basic-types.html
+https://willh.gitbook.io/typescript-tutorial/basics/primitive-data-types
+https://ithelp.ithome.com.tw/articles/10223315
+https://ithelp.ithome.com.tw/articles/10217384

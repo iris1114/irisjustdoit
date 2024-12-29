@@ -1,0 +1,202 @@
+---
+title: 'Day22 : 【TypeScript 學起來】Generic Function 泛型函式'
+date: 2021-11-02
+tags: ['typscript30', 'tech']
+draft: false
+summary: 上一篇介紹了 Generic 泛型， 其實這篇差不多意思 XDD 主要針對 Generic Function。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day22 : 【TypeScript 學起來】Generic Function 泛型函式
+
+> 上一篇介紹了 Generic 泛型， 其實這篇差不多意思 XDD 主要針對 Generic Function。
+> 若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+## Generic Function 初體驗
+
+以下例子想要取得帶入參數 array 第0個的值， 我們可以看到`s`回傳值的型別會是 `any`, 但我想要帶入不同的值對應的型別，該怎麼做呢。
+
+```typescript=
+function firstElement(arr: any[]) {
+  return arr[0];
+}
+
+const s = firstElement(["a", "b", "c"]);
+const n = firstElement([1, 2, 3]);
+
+console.log(s); //a
+console.log(n); //1
+```
+
+![](https://i.imgur.com/713sjvq.png)
+
+我們可以使用泛型，我們在函式名後添加了 &lt;Type&gt;，其中 Type 用來指代任意輸入的型別，讓型別推論自動推算出來。 可以看到變數`s`會是string型別。而`n`會是number型別。
+
+```typescript=
+function firstElement<Type>(arr: Type[]): Type {
+  return arr[0];
+}
+
+// s is of type 'string'
+const s = firstElement(["a", "b", "c"]);
+// n is of type 'number'
+const n = firstElement([1, 2, 3]);
+
+console.log(s); //a
+console.log(n); //1
+```
+
+![](https://i.imgur.com/0GkMsB4.png)
+
+---
+
+## Inference
+
+除了使用`<Type>`的方式, 可以傳入多組參數如`<Input, Output>`，讓 TypeScript 自動 inferred 型別。
+
+如下，`n` 被 inferred 為 `string`， 而透過 parseInt 字串轉數字，最後 `parsed` 被 inferred 的型別是 `number[]` 。 `Input` 及` Output` 命名可以自行定義。
+
+```typescript=
+function map<Input, Output>(
+  arr: Input[],
+  func: (arg: Input) => Output
+): Output[] {
+  return arr.map(func);
+}
+
+// Parameter 'n' is of type 'string'
+// 'parsed' is of type 'number[]'
+const parsed = map(["1", "2", "3"], (n) => parseInt(n, 10));
+
+console.log(parsed); //[1,2,3]
+```
+
+---
+
+## Constraints 型別約束
+
+以下函式有兩個傳入參數 `a` 及 `b`， 我們預期他們傳入的型別都要有 `length` 屬性，我們這時候可以使用 `extends` 關鍵字來限制參數`length` 屬性，且指定`length`是 number 型別。
+
+我們可以看到只有 notOK 會報錯，因為傳入的參數 `(10, 100)` 不符 `length` 屬性。
+
+```typescript=
+function longest<Type extends { length: number }>(a: Type, b: Type) {
+  if (a.length >= b.length) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
+// longerArray is of type 'number[]'
+const longerArray = longest([1, 2], [1, 2, 3]);
+console.log(longerArray); //[1,2,3]
+
+// longerString is of type 'alice' | 'bob'
+const longerString = longest("alice", "bob");
+console.log(longerString); //alice
+
+// Error! Numbers don't have a 'length' property
+const notOK = longest(10, 100);
+//error: Argument of type 'number' is not assignable to parameter of type '{ length: number; }'.
+
+```
+
+在官網有舉例在使用generic泛型約束的時候，可能會出錯的地方，可參考 [這裏](https://www.typescriptlang.org/docs/handbook/2/functions.html#working-with-constrained-values)。
+
+---
+
+## Specifying Type Arguments 指定參數型別
+
+在使用 generic 中有些情況 TypeScript 無法自動inferred型別，我們可以自行指定：
+
+```javascript=
+function combine<Type>(arr1: Type[], arr2: Type[]): Type[] {
+  return arr1.concat(arr2);
+}
+
+const arr = combine([1, 2, 3], ["hello"]);
+//❌ error: Type 'string' is not assignable to type 'number'.
+
+
+const arr = combine<string | number>([1, 2, 3], ["hello"]);
+console.log(arr); //[1, 2, 3, "hello"]
+// ⭕ 指定他為 string | number 聯合型別。
+
+```
+
+---
+
+## 寫出好的 Generic Function
+
+### 1.Push Type Parameters Down
+
+```typescript=
+//⭕ 返回型別為 Type
+function firstElement1<Type>(arr: Type[]) {
+  return arr[0];
+}
+
+//❌ 返回型別為 any
+function firstElement2<Type extends any[]>(arr: Type) {
+  return arr[0];
+}
+
+// a: number (good)
+const a = firstElement1([1, 2, 3]);
+// b: any (bad)
+const b = firstElement2([1, 2, 3]);
+
+```
+
+### 2. Use Fewer Type Parameters
+
+Always use as few type parameters as possible.
+
+```typescript=
+//⭕
+function filter1<Type>(arr: Type[], func: (arg: Type) => boolean): Type[] {
+  return arr.filter(func);
+}
+
+//❌
+function filter2<Type, Func extends (arg: Type) => boolean>(
+  arr: Type[],
+  func: Func
+): Type[] {
+  return arr.filter(func);
+}
+```
+
+### 3. Type Parameters Should Appear Twice
+
+If a type parameter only appears in one location, strongly reconsider if you actually need it.
+
+如果只使用到一種型別，我們應該用簡單的方式去寫即可。
+
+```typescript=
+//❌
+function greet1<Str extends string>(s: Str) {
+  console.log("Hello, " + s);
+}
+greet1("world");
+
+//⭕
+function greet2(s: string) {
+  console.log("Hello, " + s);
+}
+greet2("world");
+```
+
+---
+
+> Day22 done. 感謝閱讀，明天見！
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/functions.html#generic-functions

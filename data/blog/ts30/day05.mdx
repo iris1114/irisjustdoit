@@ -1,0 +1,166 @@
+---
+title: 'Day05:【TypeScript 學起來】TS 指定型別的三種方法'
+date: 2021-10-15
+tags: ['typscript30', 'tech']
+draft: false
+summary: 今天先來學怎麼應付 TypeScript 最需要的型別指定比較實際 GO
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day05:【TypeScript 學起來】TS 指定型別的三種方法
+
+> Q: 為什麼一個男業務(30歲)會約我一個工程師(24歲)去園區的星巴克？
+> A: 根據哥多年的經驗，他應該是有個超屌的idea只差工程師去實現了
+>
+> 原來工程師除了應付pm 也要學會怎麼應付業務 XDDD
+> 今天先來學怎麼應付 TypeScript 最需要的型別指定比較實際 GO
+
+---
+
+在 TypeScript 中， 有三種方法可以去指定型別。包含：Type Inference (型別推斷) 、 Type Annotation(型別註解) 、Type Assertions(型別斷言)。
+
+---
+
+## Type Inference (型別推斷)
+
+如果沒有明確指定型別， TypeScript 會依照型別推斷（Type Inference）的規則推斷出一個型別。如下，x 會型別推斷為 number 型別。 當 x 再賦值字串型別時， 就會報錯。
+
+```javascript=
+let x = 3;
+x = "hello"// error: Type 'number' is not assignable to type 'string'.
+```
+
+![](https://i.imgur.com/ul2cMor.png)
+
+---
+
+## Type Annotation (型別註記)
+
+TypeScript 除了可以自動型別推斷外， 我們可以手動指定型別，讓我們之後使用變數賦值的時候，可以方便debug。
+
+在變數後使用`：`即可。 入下面例子， `age`變數被指定爲 number 型別， 之後賦值字串型別 `"32"`時， 則會報錯。
+
+```typescript=
+let age: number = 18; // number variable
+let person: string = "iris"; // string variable
+let isUpdated: boolean = true; // boolean variable
+
+age = "32";//error: Type 'string' is not assignable to type 'number'.
+isUpdated = false; //ok
+
+console.log(age); //18
+console.log(person); //iris
+console.log(isUpdated); //false
+```
+
+---
+
+## Type Assertions(型別斷言)
+
+有時候你比 TypeScript 更知道你要的資料型別，TypeScript 是允許你你覆盖它的推断的， 但我們要慎用。
+
+以下例子，變數 obj 被 TypeScript 推斷為 {}，沒有屬性，所以是無法添加 age 或 name 屬性的。
+
+```typescript=
+let obj = {};
+obj.age = 18; // error: property 'age' does not exist on `{}`
+obj.name = 'iris'; // error: property 'name' does not exist on `{}`
+```
+
+如果我們要新增屬性，這時候可以使用 Assertions 斷言來指定型別，有兩種語法可以使用：
+
+```typescript=
+//使用介面（Interfaces）來定義物件的型別(後面會講到)
+interface Foo {
+  age: number;
+  name: string;
+}
+
+//語法1: 值 as 型別
+const obj2 = {} as Foo;
+obj2.age = 18;
+obj2.name = "iris";
+
+const obj3 = {
+  age: 18,
+  name: "iris"
+} as Foo;
+
+//語法2: <型別>值
+const obj4 = <Foo>{
+  age: 18,
+  name: "iris"
+};
+
+console.log("assertions-as", obj2); //{ age: 18, name: 'iris' }
+console.log("assertions-as", obj3); //{ age: 18, name: 'iris' }
+console.log("assertions-<type>", obj4); //{ age: 18, name: 'iris' }
+
+```
+
+### 語法
+
+```javascript=
+值 as 型別
+```
+
+```javascript=
+<型別>值
+```
+
+⚠ 這兩種寫法的效果是一樣的，但在 tsx 語法（React 的 jsx 語法的 ts 版）中必須用後一種(`as`)， 因為跟 jsx 的語法都會使用`<div> <span> <Xxxx>`等進行撰寫,`<型別>值` 再拿來使用會降低可讀性或造成誤會。
+
+### Assertions 要慎用
+
+1. 如果沒有按照約定增加屬性， TS 不會報錯提醒。
+
+```typescript=
+interface Foo {
+  age: number;
+  name: string;
+}
+
+const foo = {} as Foo;
+
+// ahhh, 忘記了什麼？ 沒加屬性，沒報錯提醒。 或是少一個屬性也不會報錯。
+```
+
+2. 如果 interface 被重構， 容易導致斷言也出錯。
+
+```typescript=
+interface Foo {
+  age: number;
+  name: string;
+}
+
+const foo = <Foo>{
+  // 編譯器將會提供關於 Foo 屬性的代碼提示
+ // 但是開發人員也很容易忘記添加所有的屬性
+// 同樣，如果 Foo 被重構，這段代碼也可能被破壞（例如，一個新的屬性被添加）。
+};
+```
+
+3. 建議使用更好的方法
+
+```typescript=
+interface Foo2 {
+  age: number;
+  name: string;
+}
+
+const foo2: Foo2 = {
+  // 編譯器將會提供 Foo2 屬性的代碼提示, 少了 age 和 name 的屬性
+};
+```
+
+![](https://i.imgur.com/FoqTC4j.png)
+
+---
+
+> 下一篇終於要來筆記 TypeScript 資料型別那些事～期待一下，下篇見～
+
+## 參考資料
+
+https://basarat.gitbook.io/typescript/type-system/type-assertion
+https://jkchao.github.io/typescript-book-chinese/typings/typeAssertion.html#%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80%E8%A2%AB%E8%AE%A4%E4%B8%BA%E6%98%AF%E6%9C%89%E5%AE%B3%E7%9A%84

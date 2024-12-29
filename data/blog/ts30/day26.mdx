@@ -1,0 +1,150 @@
+---
+title: 'Day26 :【TypeScript 學起來】Class 與 Interface 的使用'
+date: 2021-11-06
+tags: ['typscript30', 'tech']
+draft: false
+summary: 我們在前面的時候有提過 interface 是用來定義物件的型別，對物件的形狀進行描述。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day26 :【TypeScript 學起來】Class 與 Interface 的使用
+
+我們在前面的時候有提過 interface 是用來定義物件的型別，對物件的形狀進行描述。在物件導向程式語言中，介面（Interfaces）是一個很重要的概念，它是對行為的一種抽象，而具體如何行動則需要由類別（class）去實現（implement）。
+
+我們可以使用 implements 來檢查是否有滿足介面的形狀。
+
+---
+
+## implements
+
+```typescript=
+//報警器
+interface Alarm {
+    alert();
+}
+
+//門是一個類別
+class Door {
+}
+
+//防盜門是門的子類別, 有一個報警器的功能， 新增報警方法
+class SecurityDoor extends Door implements Alarm {
+    alert() {
+        console.log('SecurityDoor alert');
+    }
+}
+
+//車的類別也有報警器的功能，新增報警方法
+class Car implements Alarm {
+    alert() {
+        console.log('Car alert');
+    }
+}
+
+const car = new Car();
+car.alert();//Car alert
+```
+
+---
+
+## 一個類別可以實現多個介面
+
+可以使用`,`來實現多個介面:
+
+```typescript=
+interface Alarm2 {
+    alert():void;
+}
+
+interface Light2 {
+    lightOn():void;
+    lightOff():void;
+}
+
+//Car 實現了 Alarm 和 Light 介面，既能報警，也能開關車燈。
+class Car2 implements Alarm2, Light2 {
+    alert() {
+        console.log('Car alert');
+    }
+    lightOn() {
+        console.log('Car light on');
+    }
+    lightOff() {
+        console.log('Car light off');
+    }
+}
+
+
+const car2 = new Car2();
+car2.lightOn(); //Car light on
+
+
+```
+
+---
+
+## 介面繼承介面
+
+介面與介面之間可以是繼承關係：
+
+```typescript=
+interface Alarm3 {
+    alert():void;
+}
+
+interface LightableAlarm extends Alarm3 {
+    lightOn():void;
+    lightOff():void;
+}
+
+class Car3 implements LightableAlarm {
+    alert() {
+        console.log('Car alert');
+    }
+    lightOn() {
+        console.log('Car light on');
+    }
+    lightOff() {
+        console.log('Car light off');
+    }
+}
+
+const car3 = new Car3();
+car3.alert(); //Car alert
+```
+
+---
+
+## 介面繼承類別
+
+介面也可以繼承class:
+
+```typescript=
+class Point {
+    x: number;
+    y: number;
+
+    constructor(x = 0,y = 0){
+        this.x = x;
+        this.y = y;
+    }
+}
+
+interface Point3d extends Point {
+    z: number;
+}
+
+const point3d: Point3d = {x: 1, y: 2, z: 3};
+console.log(point3d); //{ x: 1, y: 2, z: 3 }
+```
+
+---
+
+> 感謝閱讀！ 明天見～
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/advanced/class-and-interfaces

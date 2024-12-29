@@ -1,0 +1,171 @@
+---
+title: 'Day16:【TypeScript 學起來】新增任意屬性的好方法：Index Signatures 索引簽名'
+date: 2021-10-26
+tags: ['typscript30', 'tech']
+draft: false
+summary: 在之前 interface 那篇文章， 認識到可以使用 Index Signatures， 發現他使用上有一些需要注意的地方，決定把他獨立一篇來寫。（然後心裡默默 耶 又多一篇XD
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day16:【TypeScript 學起來】新增任意屬性的好方法：Index Signatures 索引簽名
+
+> 在之前 interface 那篇文章， 認識到可以使用 Index Signatures， 發現他使用上有一些需要注意的地方，決定把他獨立一篇來寫。（然後心裡默默 耶 又多一篇XD
+
+Index Signatures 就是當我們有時候事先並不知道屬性名稱，或是未來會新增屬性，但知道值的形狀。我們就可以使用 Index Signatures 來描述值可能的型別。
+
+---
+
+## 定義一個 Index Signature
+
+如以下例子， 使用`[propName: string]`定義了任意屬性， 屬性名稱(key)為字串，賦值時可自行命名。對應的值(value)的型別為 string 或者 number 或是 undefined 。 這時候我們就可以新增屬性了，如下面例子新增`gender`也沒問題。（一般新增interface沒定義的屬性會報錯唷)
+
+`[propName: string] ` 名稱是可以自行定義的， 如改為 ` [key: string]`， 效果是一樣的。他可以是字串或數字型別， 數字的話如 ` [index: number]`。
+
+```typescript=
+interface IPerson {
+    name: string;
+    age?: number;
+    [propName: string]: string | number | undefined;
+}
+
+const iris: IPerson = {
+    name: 'Iris',
+    gender: 'female'
+};
+```
+
+---
+
+## 所用屬性都必須符合 Index Signatures 的描述
+
+### 例子1
+
+```typescript=
+interface IPerson {
+    name: string;
+    age?: number;
+    [propName: string]: string | number | undefined;
+}
+
+const iris: IPerson = {
+    name: 'Iris',
+    gender: 'female'
+};
+```
+
+依照上面例子有沒有奇怪為什麼要加 undefined 呢，因為我們宣告的所有屬性對應的型別，必須符合 Index Signatures 描述的型別。
+
+我一開始也沒加 `undefined` 就報錯，後來發現因為 age 是可選屬性，所以如果沒賦值就會是undefined。 當然也是因為我們有打開 tsconfig strictNullChecks，所以 complier 會特別進行檢查，檢查到 age 有可能會是 undefined， 這樣的話就跟 Index Signatures 定義值的型別沒有 match 到， 而提醒我們 not assignable。 （這個我卡了我一陣
+
+![](https://i.imgur.com/Ej5J0wk.png)
+
+### 例子2
+
+發現文筆太差，不知道你們看不看得懂，再舉個比較直覺的例子， 如下面例子，name 定義指的型別為 string 時報錯，是因為 Index Signatures 定義值的型別只有數字，所有成員屬性格式都必須符合 Index Signatures。
+
+```typescript=
+// error example
+interface NumberDictionary {
+  [index: string]: number;
+  length: number; // ok
+  name: string; //error: Property 'name' of type 'string' is not assignable to 'string' index type 'number'.
+}
+
+// ok example
+interface NumberOrStringDictionary {
+  [index: string]: number | string;
+  length: number; // ok, length is a number
+  name: string; // ok, name is a string
+}
+```
+
+![](https://i.imgur.com/LtTdbe9.png)
+
+---
+
+## 可使用 readonly
+
+也可以給予 Index Signatures `readonly` 屬性，防止屬性被修改。
+
+```typescript=
+interface ReadonlyStringArray {
+  readonly [index: number]: string;
+}
+
+let myArray: ReadonlyStringArray = {
+    1: 'a',
+    2: 'b'
+}
+
+myArray[2] = "bbb"; //error: Index signature in type 'ReadonlyStringArray' only permits reading.
+```
+
+![](https://i.imgur.com/baJDzeF.png)
+
+---
+
+## String Literal（字串字面值）& Mapped Types 的應用
+
+String Literal Type 指某些特殊的"值"可以當作"型別"來使用，用來約束取值只能是某幾個字串中的一個。
+
+Mapped Types 則是應用 `in` 在 `Index` 跑迴圈的概念。`[k in Index]?` 在新增屬性時，屬性只能是 `Index` 定義的 `'a' | 'b' | 'c'`。如下面例子， 如果新增`d` 屬性， 則會報錯提醒，不存在在`FromIndex` 的型別裡。
+
+`[k in Index]?` k 一樣可以自行命名，而`？`則會可選屬性，如下面例子， 沒賦予`a` 屬性是可以的。
+
+```typescript=
+
+//String Literal Type
+type Index = 'a' | 'b' | 'c';
+
+
+// Mapped Types
+type FromIndex = {
+    [k in Index]?: number
+};
+
+const good: FromIndex = {
+    b: 1,
+    c: 2
+};
+
+const bad: FromIndex = {
+    b:1,
+    c:2,
+    d:3
+//error:Type '{ b: number; c: number; d: number; }' is not assignable to type 'FromIndex'.
+//Object literal may only specify known properties, and 'd' does not exist in type 'FromIndex'.
+
+};
+```
+
+Mapped Types 通常會與 keyof 一起使用，有興趣的朋友可以看PJ大大的[這篇](https://pjchender.blogspot.com/2021/08/typescript-mapped-type.html)，寫得很詳細，但進階的小編之後再來學好了，先消化簡單的 （人生好難QQ
+
+---
+
+## 同時擁有 string 和 number 型別的 indexers
+
+雖然不常見， 但 Typescript 支援同時擁有 string 和 number 型別的 indexers。
+
+```typescript=
+interface ArrStr {
+  [key: string]: string | number; // Must accommodate all members
+  [index: number]: string; // Can be a subset of string indexer
+
+  // Just an example member
+  length: number;
+}
+```
+
+---
+
+> 感蟹閱讀～明天見！！是說鐵人賽好累啊啊， 今天上班差點起不來，真心佩服參賽的各位大大！
+
+---
+
+## 參考資料
+
+https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures
+https://basarat.gitbook.io/typescript/type-system/index-signatures#declaring-an-index-signature
+https://jkchao.github.io/typescript-book-chinese/typings/indexSignatures.html#%E4%BD%BF%E7%94%A8%E4%B8%80%E7%BB%84%E6%9C%89%E9%99%90%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AD%97%E9%9D%A2%E9%87%8F
+https://pjchender.blogspot.com/2021/08/typescript-mapped-type.html

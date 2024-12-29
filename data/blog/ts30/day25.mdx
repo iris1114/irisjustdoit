@@ -1,0 +1,236 @@
+---
+title: 'Day25 :【TypeScript 學起來】Class 的繼承、修飾符、abstract、static'
+date: 2021-11-05
+tags: ['typscript30', 'tech']
+draft: false
+summary: 這個跟JavaScript相同， 使用 extends 繼承類別， 建立子類別，子類別可以使用父層的東西。如下例子，依不同參數型別來使用父層的method greet。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day25 :【TypeScript 學起來】Class 的繼承、修飾符、abstract、static
+
+> 今天繼續筆記class，剩最後5天了！
+> 若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+## extends 繼承
+
+這個跟JavaScript相同， 使用 extends 繼承類別， 建立子類別，子類別可以使用父層的東西。如下例子，依不同參數型別來使用父層的method greet。
+
+```typescript=
+class Base {
+  greet() {
+    console.log("Hello, world!");
+  }
+}
+
+class Derived extends Base {
+  greet(name?: string) {
+    if (name === undefined) {
+      super.greet();
+    } else {
+      console.log(`Hello, ${name.toUpperCase()}`);
+    }
+  }
+}
+
+const a = new Derived();
+a.greet(); //Hello, world!
+a.greet("reader"); //Hello, READER
+```
+
+---
+
+## Public & Private & Protected
+
+TypeScript 可以使用三種訪問修飾符（Access Modifiers），分別是 public、private 和 protected。
+
+- 都沒寫的話，預設值為 public
+- public 修飾的屬性或方法是公有的，可以在任何地方被訪問到，預設所有的屬性和方法都是 public 的
+- private 修飾的屬性或方法是私有的，不能在宣告它的類別的外部訪問
+- protected 修飾的屬性或方法是受保護的，它和 private 類似，區別是它在子類別中也是允許被訪問的
+
+```typescript=
+class Person {
+  public name: string; //公有
+  protected age: number; //受保護的
+  private phone: number; //私有
+
+  constructor(name: string, age: number, phone: number) {
+    this.name = name;
+    this.age = age;
+    this.phone = phone;
+  }
+  getName(): string {
+    return this.name;
+  }
+  setName(name: string): void {
+    this.name = name;
+  }
+}
+class Child extends Person {
+  constructor(name: string, age: number, phone: number) {
+    super(name, age, phone);
+  }
+  desc() {
+    console.log(`${this.name}${this.age}${this.phone}`);
+    // phone 為私有屬性， 只能在 Person class 裡面使用
+  }
+}
+let child = new Child("iris", 18, 0912345678);
+console.log(child.name);
+console.log(child.age); //只能在Person及子類別裡面使用 error: Property 'age' is protected and only accessible within class 'Person' and its subclasses.
+console.log(child.phone); //只能在class Person裡使用 error: Property 'phone' is private and only accessible within class 'Person'.
+
+```
+
+---
+
+### private constructor
+
+該類別不允許被繼承或者實例化:
+
+```typescript=
+class Person2 {
+    public name:string;
+    private constructor (name:string) {
+        this.name = name;
+  }
+}
+class Child2 extends Person2 {  //無法被繼承 error: Cannot extend a class 'Person2'. Class constructor is marked as private.
+    constructor (name) {
+        super(name);
+    }
+}
+
+let a = new Child2('iris');
+```
+
+---
+
+### protected constructor
+
+允許在子類別中使用：
+
+```typescript=
+class Person3 {
+    public name:string;
+    protected constructor (name:string) {
+        this.name = name;
+  }
+}
+class Child3 extends Person3 {
+    constructor (name:string) {
+        super(name);
+        console.log(name);
+    }
+}
+
+let a3 = new Child3('iris');
+console.log(a3); //Child3 { name: 'iris' }
+```
+
+---
+
+## Abstract 抽象
+
+abstract 用於定義抽象類別和其中的抽象方法。
+
+抽象類別是不允許被實例化的，下面例子我們定義了抽象類別 Animal，並且定義了一個抽象方法 sayHi。在實例化抽象類別的時候報錯了。:
+
+```typescript=
+abstract class Animal {
+  public name;
+  public constructor(name:string) {
+      this.name = name;
+  }
+  public abstract sayHi(): void;
+}
+
+let b = new Animal('Tom'); //error: Cannot create an instance of an abstract class.
+```
+
+抽象類別中的抽象方法必須被子類別實現：
+
+```typescript=
+abstract class Animal2 {
+  public name;
+  public constructor(name:string) {
+      this.name = name;
+  }
+  public abstract sayHi():void;
+}
+
+class Cat extends Animal {
+  public sayHi() {
+      console.log(`Meow, My name is ${this.name}`);
+  }
+}
+
+let cat = new Cat('Tom');
+```
+
+---
+
+## static
+
+使用 static 修飾符修飾的方法稱為靜態方法，它們不需要實例化，而是直接透過類別來呼叫：
+
+```typescript=
+class Animal3 {
+    public name;
+    public constructor(name:string) {
+        this.name = name;
+    }
+    static isAnimal(c:object) {
+        return c instanceof Animal;
+    }
+}
+
+let c = new Animal3('Tom');
+let d = Animal3.isAnimal(c);
+console.log(d); //true
+c.isAnimal(c); //c.isAnimal is not a function
+```
+
+---
+
+### 可以搭配 public 、 protected 和 private 一起使用
+
+```typescript=
+class MyClass {
+  private static x = 0;
+}
+console.log(MyClass.x); //error:Property 'x' is private and only accessible within class 'MyClass'.
+```
+
+---
+
+### static 也能夠繼承
+
+```typescript=
+class Base2 {
+  static getGreeting() {
+    return "Hello world";
+  }
+}
+class Derived2 extends Base2 {
+  myGreeting = Derived2.getGreeting();
+}
+
+let derived2 = new Derived2();
+console.log(derived2);
+```
+
+---
+
+> 感謝閱讀，明天見～
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/advanced/class
+https://www.typescriptlang.org/docs/handbook/2/classes.html

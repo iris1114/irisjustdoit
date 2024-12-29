@@ -1,0 +1,260 @@
+---
+title: 'Day15: 【TypeScript 學起來】Interface VS Type Aliases 用法與差別'
+date: 2021-10-25
+tags: ['typscript30', 'tech']
+draft: false
+summary: 上一篇講到 interface，今天這篇會來講 type， 他們兩個功能幾乎很像，但還是有些不一樣，讓我們看下去。不過這之前先介紹一下 Type Aliases(型別別名)。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day15: 【TypeScript 學起來】Interface VS Type Aliases 用法與差別
+
+> 上一篇講到 interface，今天這篇會來講 type， 他們兩個功能幾乎很像，但還是有些不一樣，讓我們看下去。不過這之前先介紹一下 Type Aliases(型別別名)。
+
+## Type Aliases(型別別名)
+
+Type Aliases(型別別名) 用來給一個型別起個新名字，起手式就是使用`type`來進行宣告。他比較常用於聯合型別，但他也可以跟 interface 一樣可以定義物件、function， 下面也會介紹他們的差別。
+
+> A type alias is exactly that - a name for any type.
+
+如以下例子，`id` 型別有點重複：
+
+```javascript=
+const printId = (id: string | number) => {
+    console.log(`my id is ${id}`)
+}
+
+const sayHi = (person:{name: string, id: string | number}) => {
+    console.log(`hi, ${person.name}! your id is ${id}.`)
+}
+```
+
+這時候我們就可以使用Type Aliases(型別別名)，給`string | number`定義型別，幫助我們簡化程式碼，讓型別可以共用。是不是整齊很多，也方便後續維護。
+
+```typescript=
+type StringOrNum = string | number;
+type objWithName = {name: string, id : StringOrNum };
+
+const printId = (id: StringOrNum) => {
+    console.log(`${name} id is ${id}`)
+}
+
+const sayHi = (person:objWithName) => {
+     console.log(`hi, ${person.name}! your id is ${id}.`)
+}
+```
+
+---
+
+## Type Aliases(型別別名) vs Interfaces(介面)
+
+前面也有提到他們功能很像， 我們來看看他們的相同處及不同處有哪些：
+
+### 相同處1: 都可以定義物件（object, function, array）形狀
+
+都可使用 readonly / 可選屬性 / 新增任意屬性 / function overload
+
+interface:
+
+```typescript=
+//object
+interface IUser {
+    readonly id: number;
+    name: string;
+    age?: number;
+    [propName: string]: any;
+    getWeight(): number;
+    getWeight(x?: number): number;
+}
+
+//function
+interface SetPoint {
+  (x: number, y: number): void;
+}
+
+//array
+interface NumberArray {
+    [index: number]: number;
+}
+```
+
+type:
+
+```typescript=
+//object
+type User = {
+    readonly id: number;
+    name: string;
+    age?: number;
+    [propName: string]: any;
+    getWeight(): number;
+    getWeight(x?: number): number;
+}
+
+//function
+type SetPoint = (x: number, y: number) => void;
+
+//array
+type NumberArray = {
+    [index: number]: number;
+}
+```
+
+---
+
+### 相同處2: 都可以 extend , 只是用法不同
+
+Extending an interface:
+
+```typescript=
+interface Animal {
+  name: string
+}
+
+interface Bear extends Animal {
+  honey: boolean
+}
+```
+
+Extending a type via intersections:
+
+```typescript=
+type Animal = {
+  name: string
+}
+
+type Bear = Animal & {
+  honey: boolean
+}
+```
+
+interface extends type:
+
+```typescript=
+type Name = {
+  name: string;
+}
+interface User extends Name {
+  age: number;
+}
+```
+
+Extending interface & type via intersections:
+
+```typescript=
+interface Name {
+  name: string;
+}
+type User = Name & {
+  age: number;
+}
+```
+
+---
+
+### 相同處3: 都可以被 class implement
+
+interface:
+
+```typescript=
+interface Point {
+  x: number;
+  y: number;
+}
+
+class SomePoint implements Point {
+  x = 1;
+  y = 2;
+}
+```
+
+type:
+
+```typescript=
+type Point2 = {
+  x: number;
+  y: number;
+};
+
+class SomePoint2 implements Point2 {
+  x = 1;
+  y = 2;
+}
+```
+
+但要特別注意， 如果是 union type 是無法被 implements 的。
+
+```typescript=
+type PartialPoint = { x: number; } | { y: number; };
+
+//error: A class can only implement an object type or intersection of object types with statically known members.
+class SomePartialPoint implements PartialPoint {
+  x = 1;
+  y = 2;
+}
+```
+
+---
+
+### 不同處1: interface 名稱可以重複定義並合併 ， type 不行
+
+interface:
+
+```typescript=
+interface Window {
+  title: string
+}
+
+interface Window {
+  ts: TypeScriptAPI
+}
+
+```
+
+type:
+
+```typescript=
+type Window = {
+  title: string
+}
+
+type Window = {
+  ts: TypeScriptAPI
+}// Error: Duplicate identifier 'Window'.
+
+```
+
+---
+
+### 不同處2： type 可以描述 primitive type、tuple、union type 等, interface 無法
+
+```typescript=
+//primitive type
+type Name = string
+
+interface Dog {
+    arfarf();
+}
+interface Cat {
+    meow();
+}
+
+//union type
+type Pet = Dog | Cat
+
+//tuple
+type PetList = [Dog, Pet]
+```
+
+---
+
+> 感想閱讀～明天會來講 index signature，明天見！
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/advanced/type-aliases
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-aliases
+https://ithelp.ithome.com.tw/articles/10216626
+https://ithelp.ithome.com.tw/articles/10224646
+https://github.com/SunshowerC/blog/issues/7#type-extends-type

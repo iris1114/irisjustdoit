@@ -1,0 +1,117 @@
+---
+title: 'Day18: 【TypeScript 學起來】Narrowing Part 2'
+date: 2021-10-28
+tags: ['typscript30', 'tech']
+draft: false
+summary: 繼續來筆記 Narrowing， 還有哪些方法能進行 narrow 型別呢。 若有錯誤，歡迎留言指教，感恩的心。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day18: 【TypeScript 學起來】Narrowing Part 2
+
+> 好 繼續來筆記 Narrowing， 還有哪些方法能進行 narrow 型別呢。 若有錯誤，歡迎留言指教，感恩的心。
+
+---
+
+## 使用 type predicates（型別謂語）
+
+- 如果我們要自定義type guard，可以定義一個函式，這個函式返回的值就是 type predicates。
+- type predicate 指的就是 `parameterName is Type`。以下方例子， `pet is Fish` 就是 type predicate。
+- `parameterName` 必須要是函式中參數的名稱，下方例子的的參數名稱就是 `pet` , 所以 `parameterName` 就會是 `pet`。
+- 函式最後會回傳 true 或 false，如果是 true，表示符合該變數符合該 type predicate。
+
+```javascript=
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+
+//pet 有可能是 Fish or Bird 的型別
+//isFish 這個function 回傳值的型別為 : pet is Fish，看是回傳 true or false
+//當返回了true, 那他就是Fish
+
+function isFish(pet: Fish | Bird): pet is Fish {
+  return (pet as Fish).swim !== undefined;   //（pet as Fish）斷言 pet 為 Fish 型別 ， 所以 swim 不會是undefined
+}
+```
+
+---
+
+## Discriminated unions （可辨識聯合）
+
+TypeScript 可以針對相同的可識別的屬性來自動判斷型別，再去執行不同情境的操作，他有3個要素：
+
+1. 每個interface需要有相同的可辨識的屬性，如 `kind`
+2. 使用type alias宣告聯合型別，他包含了哪些型別， 如 `type Shape = Circle | Square;`
+3. 使用 type guard， 如` shape.kind === "circle"`
+
+```typescript=
+
+interface Circle {
+  kind: "circle";
+  radius: number;
+}
+
+interface Square {
+  kind: "square";
+  sideLength: number;
+}
+
+type Shape = Circle | Square;
+
+function getArea(shape: Shape) {
+  if (shape.kind === "circle") {
+    return Math.PI * shape.radius ** 2;
+  }
+}
+
+let area = getArea({ kind: "circle", radius: 5});
+console.log(area);
+```
+
+### 可用在後端回傳 response
+
+看 pj 大大的文章是推薦在接收後端傳來的 response 的時候很好用， status 是 OK 的話，則資料會帶有 payload，否則資料會帶有 error。我們可以自行定義多個不同的 Type，這些Type有共同的欄位， 如 `status`，那就用這個欄位來判斷還有哪些屬性。
+
+最後沒有判斷到的情況可以利用 exhaustiveness checking， 用`never`型別表示不應該存在的狀態，一般用於錯誤處理。
+
+```javascript=
+interface ISuccessResp {
+  status: 'OK';  //相同欄位 status
+  payload: unknown;
+}
+
+interface IErrorResp {
+  status: 'ERROR';
+  errorCode: number;
+  description: string;
+}
+
+type Resp = ISuccessResp | IErrorResp;
+
+const parseResponse = (resp: Resp) => {
+  switch (resp.status) {
+    case 'OK':  //透過 narrow 知道是 ISuccessResp 型別
+      return resp.payload; //則去使用ISuccessResp的屬性payload
+    case 'ERROR': // 透過 narrow 知道是 IErrorResp 型別
+      return resp.description; //則去使用IErrorResp的屬性payload
+    default:
+      const _exhaustiveCheck: never = resp;
+      return _exhaustiveCheck;
+  }
+};
+```
+
+---
+
+> 這兩天跑出去玩，幫好久不見的朋友慶生，久違的開心XD (好多好朋友都是10月生日， 生日快樂呀， 天秤寶寶們
+> 不過回到家，看到文章庫存一天一天用完，覺得好可怕，好吧， 明天又是禮拜一了，一起加油 💪
+
+---
+
+## 參考資料
+
+https://pjchender.dev/typescript/ts-narrowing/#user-defined-type-guards
+https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+https://ithelp.ithome.com.tw/articles/10222470
+https://blog.csdn.net/weixin_34088583/article/details/92693893
+https://zh.wikipedia.org/wiki/%E6%A0%87%E7%AD%BE%E8%81%94%E5%90%88

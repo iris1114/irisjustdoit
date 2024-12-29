@@ -1,0 +1,178 @@
+---
+title: 'Day23 :【TypeScript 學起來】先了解 ES6 Class'
+date: 2021-11-03
+tags: ['typscript30', 'tech']
+draft: false
+summary: Class是什麼？簡單來說就是物件的模板，定義了一件事物的抽象特點，包含它的屬性和方法，提供一個更簡潔的語法來建立物件和處理繼承。
+images: ['']
+authors: ['chick_playground']
+---
+
+# Day23 :【TypeScript 學起來】先了解 ES6 Class
+
+> 因為我沒什麼用到 Class，這一篇會筆記 ES6 Class 的使用， 下一篇才會進到 TypeScript 中使用 class ， 以及使用 class 來實現 interface。 那我們先來了解 ES6 Class 吧～～
+> 若有錯誤，歡迎留言指教，感恩的心。
+
+## Class是什麼？
+
+簡單來說就是物件的模板，定義了一件事物的抽象特點，包含它的屬性和方法，提供一個更簡潔的語法來建立物件和處理繼承。
+
+---
+
+## 如何定義？
+
+有兩種方式可以定義 class： class declaration 及 class expressions。(跟定義fucntion很像)
+
+### 1. Class Declaration
+
+要使用關鍵字 class， 搭配名稱(如 "Point")，通常都是第一個字大寫表示。
+
+```javascript=
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+```
+
+### 2. Class Expressions
+
+一樣 class expressions 需使用 class 關鍵字，只是他可以有名稱或是無名稱。
+
+```javascript=
+// unnamed
+let Point = class {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+};
+
+// named
+let Point = class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+};
+```
+
+---
+
+## 一些 Class 要知道的事
+
+1.  **constructor:** 用來初始建構一個類別(class)的物件。一個class 只能有一個 constructor。
+2.  **extends:** 使用 extends 繼承類別， 建立子類別，子類別可以使用父層的東西。
+3.  **super:** 可以使用 super 於通過函式存取父層，super 關鍵字必須出現在this 關鍵字之前使用
+4.  **prototype methods :** 建立class的方法
+5.  **getter :** 使用關鍵字 get，用以改變屬性的讀取
+6.  **setter :** 使用關鍵字 set，用以改變屬性的賦值
+7.  **static method:** 使用關鍵字 static 在 class 建立靜態方法，在class中的其他方法都不能使用他，靜態方法常被用來建立給應用程式使用的工具函數。
+
+看例子比較快理解：
+
+```javascript=
+class Point {
+
+  //建構初始物件
+  constructor(x = 0, y = 0) { //預設給0
+    this.x = x;
+    this.y = y;
+  }
+
+  //prototype methods
+  printPoint() {
+    console.log(`x: ${this.x}, y: ${this.y}`);
+  }
+
+  //getter
+  get xValue() {
+    return this.x;
+  }
+
+  //setter
+  set xValue(z) {
+    if (z < 0) {
+      z = 0;
+    }
+    this.x = z;
+  }
+
+  //static method without this
+  static distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+}
+
+//用 new 來使用這個模板
+let p = new Point(2, 4);
+p.printPoint(); //x: 2, y: 4
+
+//getter 直接像屬性一樣訪問
+console.log(`get x value: ${p.xValue}`); //get x value: 2
+
+//setter 直接用 = 來賦值即可
+p.xValue = -5;
+console.log(`set x value: ${p.xValue}`); // set x value: 0
+
+//static
+let p1 = new Point(10, 12);
+let p2 = new Point(16, 18);
+console.log(Point.distance(p1, p2)); //8.48528137423857
+
+```
+
+```javascript=
+//用 extends 繼承類別Point， 建立子類別addPoint
+class AddPoint extends Point {
+  constructor(x, y) {
+    super(x, y); //用super呼叫父層的constructor（x,y）
+    this.x = x;
+    this.y = y;
+  }
+
+  add() {
+    this.printPoint(); //因為已繼承，可以直接使用父層的方法
+    return `total = ${this.x + this.y}`;
+  }
+}
+
+let p3 = new AddPoint(5, 7);
+console.log(p3.add()); //total = 12
+```
+
+筆記：
+
+- 是可以不指定constructor的，如果不指定 constructor， 就會就會使用預設的 constructor，長這樣`constructor() {}`。
+
+- getter & setter 的好處就是，不會改變原本constructor的東西，也可以直接像使用 class 的屬性一樣去使用。
+
+- 原本以為使用getter & setter很方便， 不用特別建立method，使用上可以直接像屬性一樣使用， 但剛好看到文章，說不建議使用 getter 和 setter，因為它可能會發生無預期的副作用，並且難以測試與維護；如果需要，使用原型方法（prototype method）自己建立，例如` getVal()` 和 `setVal('Hello')`。 [airbnb JS Style Guide](https://github.com/airbnb/javascript#accessors--no-getters-setters) 有提到。因為我沒有用過getter & setter，想知道有什麼副作用。
+
+- static method使用上有兩種方式，一個是使用 `this`， 另一個是不使用 `this`。 如果使用`this`, 在呼叫時需搭配`call`來使用。[參考這篇](https://pjchender.dev/javascript/js-class/#static-method%E9%9D%9C%E6%85%8B%E6%96%B9%E6%B3%95)
+
+- 物件（Object）：類別的實例，透過 new 產生。
+- 面向物件（OOP）的三大特性：封裝、繼承、多型。
+- 封裝（Encapsulation）：將對資料的操作細節隱藏起來，只暴露對外的介面。外界呼叫端不需要（也不可能）知道細節，就能透過對外提供的介面來訪問該物件，同時也保證了外界無法任意更改物件內部的資料。
+- 繼承（Inheritance）：子類別繼承父類別，子類別除了擁有父類別的所有特性外，還有一些更具體的特性。
+- 多型（Polymorphism）：由繼承而產生了相關的不同的類別，對同一個方法可以有不同的響應。比如 `Cat` 和 `Dog` 都繼承自 `Animal`，但是分別實現了自己的 `eat` 方法。此時針對某一個實例，我們無需瞭解它是 `Cat` 還是 `Dog`，就可以直接呼叫 `eat` 方法，程式會自動判斷出來應該如何執行 `eat`。
+- 修飾符（Modifiers）：修飾符是一些關鍵字，用於限定成員或型別的性質。比如 public 表示公有屬性或方法。
+- 抽象類別（Abstract Class）：抽象類別是供其他類別繼承的基底類別，抽象類別不允許被實例化。抽象類別中的抽象方法必須在子類別中被實現
+- 介面（Interfaces）：不同類別之間公有的屬性或方法，可以抽象成一個介面。介面可以被類別實現（implements）。一個類別只能繼承自另一個類別，但是可以實現多個介面。
+
+---
+
+> 耶 雙10連假快樂～感謝閱讀！明天就進入 TypeScript 中使用 class，明天見！
+
+---
+
+## 參考資料
+
+https://willh.gitbook.io/typescript-tutorial/advanced/class
+https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Classes
+https://pjchender.dev/javascript/js-class/
+https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Classes/static
