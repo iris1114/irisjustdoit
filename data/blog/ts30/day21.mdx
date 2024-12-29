@@ -1,9 +1,9 @@
 ---
-title: '鐵人賽Day01: 為什麼我想要學 TypeScript'
-date: 2021-10-11
-tags: ['ts30', 'tech']
+title: 'Day21:【TypeScript 學起來】Generics 泛型'
+date: 2021-11-01
+tags: ['typscript30', 'tech']
 draft: false
-summary: 這是一篇欠了很久的開場，大概轉行不到1年的時候，就一直聽到 TypeScript 的名字，想說到底是啥
+summary: 泛型（Generics）是指在定義function、interfaces或class的時候，不預先指定具體的型別而在使用的時候再指定型別的一種特性。
 images: ['']
 authors: ['chick_playground']
 ---
@@ -110,7 +110,7 @@ const tuple2 = makeTuple2([1, "a"]);
 console.log(tuple2); //[ 1, 'a' ]
 ```
 
-⚠ arrow function 能在 .ts 但不能在 .tsx 中使用， 因為 tsx 中， TS compiler 會無法清楚區分 <> 是指 JSX 或 Generics Type， 所以當需要在函式中定義泛型時，就直接使用傳統的 Function Statement。
+⚠ arrow function 能在 .ts 但不能在 .tsx 中使用， 因為 tsx 中， TS compiler 會無法清楚區分 &lt;&gt; 是指 JSX 或 Generics Type， 所以當需要在函式中定義泛型時，就直接使用傳統的 Function Statement。
 
 ---
 
