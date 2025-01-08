@@ -1,0 +1,173 @@
+---
+title: 'Three.js Transform'
+date: 2025-01-08
+tags: ['threejs', 'tech']
+draft: false
+summary: Three.js 物件進行變形的方法
+images: ['']
+authors: ['chick_playground']
+---
+
+![](/static/images/threejs/transform.png)
+
+## 1. 變形物件的四種屬性
+
+在 Three.js 中，可以通過以下四種屬性來對場景中的物件進行變形 (Transformations)：
+
+- **position**：用於移動物件的位置。
+- **scale**：用於調整物件的大小。
+- **rotation**：用於旋轉物件。
+- **quaternion**：也用於旋轉物件（更數學化，解決旋轉順序的問題）。
+
+## 2. 移動物件 (position)
+
+position 是一個三維向量，擁有 x、y 和 z 三個屬性：
+
+- x：控制物件向左或向右移動（正值向右，負值向左）。
+- y：控制物件向上或向下移動（正值向上，負值向下）。
+- z：控制物件向前或向後移動（正值向後，負值向前）。
+
+範例：
+
+```js
+mesh.position.x = 0.7 // 向右移動 0.7 單位
+mesh.position.y = -0.6 // 向下移動 0.6 單位
+mesh.position.z = 1 // 向後移動 1 單位
+```
+
+可以用 set(x, y, z) 方法一次性設定三個屬性：
+
+```js
+mesh.position.set(0.7, -0.6, 1)
+```
+
+額外功能：
+計算向量的長度：
+
+```js
+console.log(mesh.position.length()) // 計算從原點到物件的距離
+```
+
+計算與其他物件的距離：
+
+```js
+console.log(mesh.position.distanceTo(camera.position)) // 計算物件與相機的距離
+```
+
+## 3. 使用輔助工具 (AxesHelper)
+
+當我們移動物件時，很容易迷失方向。可以使用 AxesHelper 來顯示場景中的三個軸：
+
+- 紅色 (Red)：x 軸
+- 綠色 (Green)：y 軸
+- 藍色 (Blue)：z 軸
+
+範例：
+
+```js
+const axesHelper = new THREE.AxesHelper(2) // 創建長度為 2 單位的輔助軸
+scene.add(axesHelper) // 添加到場景
+```
+
+## 4. 調整物件大小 (scale)
+
+scale 屬性用來調整物件的大小，也是三維向量。默認值為 1（表示原始大小）：
+
+- x、y 和 z 值越大，對應軸的大小越大。
+- 值為 0.5，物件會縮小一半；值為 2，物件會放大兩倍。
+
+範例：
+
+```js
+mesh.scale.x = 2 // 寬度放大兩倍
+mesh.scale.y = 0.25 // 高度縮小為四分之一
+mesh.scale.z = 0.5 // 深度縮小一半
+```
+
+## 5. 旋轉物件 (rotation)
+
+rotation 屬性是 Euler 類型，控制物件的旋轉，對應 x、y 和 z 三個軸的旋轉角度（以弧度表示）：
+
+- 旋轉 x 軸：像車輪旋轉。
+- 旋轉 y 軸：像旋轉木馬。
+- 旋轉 z 軸：像飛機螺旋槳。
+
+範例：
+
+```js
+mesh.rotation.x = Math.PI * 0.25 // 在 x 軸旋轉 45 度 (1/4 圓)
+mesh.rotation.y = Math.PI * 0.25 // 在 y 軸旋轉 45 度
+```
+
+注意：旋轉的順序
+Three.js 預設的旋轉順序是 x -> y -> z。如果順序導致奇怪的行為，可以用 reorder() 修改：
+
+```js
+mesh.rotation.reorder('YXZ')
+```
+
+## 6. 讓物件朝向目標 (lookAt)
+
+lookAt() 方法可讓物件的 -z 軸 朝向指定目標。
+
+範例：
+讓相機看向 (0, -1, 0)：
+
+```js
+camera.lookAt(new THREE.Vector3(0, -1, 0))
+```
+
+讓相機看向物件的位置：
+
+```js
+camera.lookAt(mesh.position)
+```
+
+## 7. 組合變形
+
+可以同時調整位置、大小和旋轉，並且順序不會影響結果。例如：
+
+```js
+mesh.position.set(0.7, -0.6, 1) // 設定位置
+mesh.scale.set(2, 0.25, 0.5) // 設定大小
+mesh.rotation.set(Math.PI * 0.25, Math.PI * 0.25, 0) // 設定旋轉
+```
+
+## 8. 群組物件 (Group)
+
+當場景包含多個物件時，可以將它們分組，方便進行整體操作。群組是 Group 類型，繼承自 Object3D。
+
+範例：
+建立一個包含三個立方體的群組：
+
+```js
+const group = new THREE.Group() // 創建群組
+group.scale.y = 2 // 群組整體縮放
+group.rotation.y = 0.2 // 群組整體旋轉
+scene.add(group) // 添加群組到場景
+
+const cube1 = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: '0xff0000' })
+)
+cube1.position.x = -1.5 // 移動第一個立方體
+group.add(cube1) // 添加到群組
+
+const cube2 = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+)
+group.add(cube2) // 第二個立方體保持在中心
+
+const cube3 = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: 0x0000ff })
+)
+cube3.position.x = 1.5 // 移動第三個立方體
+group.add(cube3) // 添加到群組
+```
+
+這樣，對 group 的任何變形（如位置、旋轉或縮放），都會同步影響群組內的所有物件。
+
+總結
+這些程式碼示範了如何使用 Three.js 的基本變形功能來操控 3D 場景中的物件，從簡單的移動到群組操作，為後續的動畫和更複雜的應用打下基礎。
