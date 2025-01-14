@@ -5,6 +5,7 @@ import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import LocalSwitcher from './LocalSwitcher'
 
 const Header = () => {
   return (
@@ -19,7 +20,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="flex items-center space-x-4 leading-5 sm:space-x-6">
-        {headerNavLinks
+        {headerNavLinks()
           .filter((link) => link.href !== '/')
           .map((link) => (
             <Link
@@ -33,6 +34,7 @@ const Header = () => {
           ))}
         <SearchButton />
         <ThemeSwitch />
+        <LocalSwitcher />
         <MobileNav />
       </div>
     </header>

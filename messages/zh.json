@@ -1,0 +1,17 @@
+{
+  "IndexPage": {
+    "description": "熱愛旅行、挑戰自我、分享經驗，並沉浸於學習與發掘新事物的樂趣，致力於過上「Just Do It」想做就去做的生活。",
+    "lifePost": "最新文章 - 生活",
+    "techPost": "最新文章 - 技術"
+  },
+  "NotFoundPage": {
+    "title": "Halaman Tidak Ditemukan",
+    "description": "Ups! Sepertinya Anda menemukan halaman yang tidak ada. Jangan khawatir, sihir internasionalisasi kami masih bekerja keras di bagian lain aplikasi. Silakan kembali untuk menjelajahi lebih lanjut!"
+  },
+  "Navigation": {
+    "home": "Beranda"
+  },
+  "Footer": {
+    "copyright": "© 2024 Aplikasi Anda. Hak cipta dilindungi."
+  }
+}

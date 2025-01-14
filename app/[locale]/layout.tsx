@@ -9,7 +9,7 @@ import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
 import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
-import { ThemeProviders } from './theme-providers'
+import { ThemeProviders } from '/app/[locale]/theme-providers'
 import { Metadata } from 'next'
 
 const raleway = Raleway({
@@ -58,15 +58,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+interface RootLayoutProps {
+  children: React.ReactNode
+  params: {
+    locale: string
+  }
+}
+
+export default function RootLayout({ children, params: { locale } }: Readonly<RootLayoutProps>) {
   const basePath = process.env.BASE_PATH || ''
 
   return (
-    <html
-      lang={siteMetadata.language}
-      className={`${raleway.variable} scroll-smooth`}
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={`${raleway.variable} scroll-smooth`} suppressHydrationWarning>
       <link rel="apple-touch-icon" sizes="76x76" href={`${basePath}/static/favicons/favicon.png`} />
       <link
         rel="icon"

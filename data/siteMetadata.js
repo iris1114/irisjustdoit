@@ -4,7 +4,7 @@ const siteMetadata = {
   author: 'Iris Chew',
   headerTitle: 'irisjustdoit',
   description: '前端旅遊紀錄生活的部落格',
-  language: 'en-us',
+  language: 'en',
   theme: 'system', // system, dark or light
   siteUrl: 'https://irisjustdoit.cc',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',

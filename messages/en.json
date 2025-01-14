@@ -1,0 +1,17 @@
+{
+  "IndexPage": {
+    "description": "I love traveling, challenging myself, sharing experiences, and enjoying the fun of learning and discovering new things. I'm all about living a \"Just Do It\" kind of life—doing what I want, when I want!",
+    "lifePost": "Latest Posts - Life",
+    "techPost": "Latest Posts - Tech"
+  },
+  "NotFoundPage": {
+    "title": "Page Not Found",
+    "description": "Oops! It seems like you've stumbled upon a page that doesn't exist. Don't worry, our internationalization magic is still hard at work on other parts of the app. Feel free to navigate back to explore more!"
+  },
+  "Navigation": {
+    "home": "Home"
+  },
+  "Footer": {
+    "copyright": "© 2024 Your App. All rights reserved."
+  }
+}

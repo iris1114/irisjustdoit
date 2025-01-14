@@ -5,20 +5,19 @@ import { formatDate } from 'pliny/utils/formatDate'
 import NewsletterForm from 'pliny/ui/NewsletterForm'
 import HeroImg from '@/data/hero-1.svg'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 const MAX_DISPLAY_LIFE = 9
 const MAX_DISPLAY_TECH = 8
 
 export default function Home({ posts }) {
+  const t = useTranslations('IndexPage')
   return (
     <>
       <div className="mb-12 flex flex-col items-center justify-evenly md:flex-row">
         <div className="order-1 md:w-1/2">
           <h2 className="py-4 text-2xl md:text-3xl"> Iris Just Do It.</h2>
-          <p>
-            熱愛旅行、挑戰自我、分享經驗，並沉浸於學習與發掘新事物的樂趣，致力於過上「Just Do
-            It」想做就去做的生活。。
-          </p>
+          <p>{t('description')}</p>
         </div>
         <div className=" w-full md:order-1 md:w-1/2">
           <HeroImg className=" fill-gray-800 dark:fill-gray-500" />
@@ -27,7 +26,7 @@ export default function Home({ posts }) {
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="space-y-2 pb-8 pt-6 md:space-y-5">
           <h1 className="text-2xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-2xl sm:leading-10 md:text-4xl md:leading-14">
-            Latest Post - Life
+            {t('lifePost')}
           </h1>
         </div>
         <ul className="grid grid-cols-1 gap-4 divide-y divide-gray-200 dark:divide-gray-700 md:grid-cols-3 ">
@@ -96,7 +95,7 @@ export default function Home({ posts }) {
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="space-y-2 pb-8 pt-6 md:space-y-5">
           <h1 className="text-2xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-2xl sm:leading-10 md:text-4xl md:leading-14">
-            Latest Post - Tech
+            {t('techPost')}
           </h1>
         </div>
         <ul className="grid grid-cols-1 gap-4 divide-y divide-gray-200 dark:divide-gray-700 md:grid-cols-2 ">
