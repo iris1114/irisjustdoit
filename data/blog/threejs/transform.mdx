@@ -8,7 +8,11 @@ images: ['']
 authors: ['chick_playground']
 ---
 
-![](/static/images/threejs/transform.png)
+![](/static/images/threejs/transform/transform.png)
+
+github: https://github.com/iris1114/threejs
+
+demo: https://transform-objects.netlify.app/
 
 ## 1. 變形物件的四種屬性
 
@@ -69,6 +73,8 @@ const axesHelper = new THREE.AxesHelper(2) // 創建長度為 2 單位的輔助�
 scene.add(axesHelper) // 添加到場景
 ```
 
+![](/static/images/threejs/transform/transform.png)
+
 ## 4. 調整物件大小 (scale)
 
 scale 屬性用來調整物件的大小，也是三維向量。默認值為 1（表示原始大小）：
@@ -86,7 +92,7 @@ mesh.scale.z = 0.5 // 深度縮小一半
 
 ## 5. 旋轉物件 (rotation)
 
-rotation 屬性是 Euler 類型，控制物件的旋轉，對應 x、y 和 z 三個軸的旋轉角度（以弧度表示）：
+rotation 屬性是 Euler 類型（歐拉旋轉定理），控制物件的旋轉，對應 x、y 和 z 三個軸的旋轉角度（以弧度表示）：
 
 - 旋轉 x 軸：像車輪旋轉。
 - 旋轉 y 軸：像旋轉木馬。
@@ -120,7 +126,9 @@ camera.lookAt(new THREE.Vector3(0, -1, 0))
 讓相機看向物件的位置：
 
 ```js
-camera.lookAt(mesh.position)
+camera.lookAt(scene.position)
+camera.lookAt(group.position)
+camera.lookAt(cube1.position)
 ```
 
 ## 7. 組合變形
@@ -135,7 +143,7 @@ mesh.rotation.set(Math.PI * 0.25, Math.PI * 0.25, 0) // 設定旋轉
 
 ## 8. 群組物件 (Group)
 
-當場景包含多個物件時，可以將它們分組，方便進行整體操作。群組是 Group 類型，繼承自 Object3D。
+除了以上物件單獨設定變形之外，當場景包含多個物件時，可以將它們分組，方便進行整體變形操作。群組是 Group 類型。
 
 範例：
 建立一個包含三個立方體的群組：
@@ -170,4 +178,4 @@ group.add(cube3) // 添加到群組
 這樣，對 group 的任何變形（如位置、旋轉或縮放），都會同步影響群組內的所有物件。
 
 總結
-這些程式碼示範了如何使用 Three.js 的基本變形功能來操控 3D 場景中的物件，從簡單的移動到群組操作，為後續的動畫和更複雜的應用打下基礎。
+紀錄了如何使用 Three.js 的基本變形功能來操控 3D 場景中的物件，從簡單的移動到群組操作.
