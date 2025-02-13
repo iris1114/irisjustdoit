@@ -22,6 +22,8 @@ Scene 是個容器，用於存放所有 objects (物件)、models (模型)、par
 const scene = new THREE.Scene()
 ```
 
+---
+
 ## 2. Objects
 
 ### Mesh (網格): 結合 geometry (幾何體) 和 material (材質) 形成可見的物件。
@@ -38,6 +40,8 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true 
 const mesh = new THREE.Mesh(geometry, material) // 創建網格
 scene.add(mesh) // 添加到場景
 ```
+
+---
 
 ## 3. Camera
 
@@ -57,6 +61,8 @@ camera.position.z = 3 // 將相機向後移動
 scene.add(camera) // 添加相機到場景
 ```
 
+---
+
 ## 4. Renderer
 
 Renderer 的作用是將 Scene 從 Camera 的視角渲染到 canvas 上。
@@ -71,6 +77,8 @@ const canvas = document.querySelector('canvas.webgl') // 選取畫布
 const renderer = new THREE.WebGLRenderer({ canvas: canvas }) // 創建渲染器
 renderer.setSize(sizes.width, sizes.height) // 設置畫布尺寸
 ```
+
+---
 
 ## 5. First Render
 
@@ -116,6 +124,8 @@ renderer.setSize(sizes.width, sizes.height)
 // Render
 renderer.render(scene, camera)
 ```
+
+---
 
 ## Others
 
